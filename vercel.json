@@ -2,11 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/sync-matches",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/score-matches",
-      "schedule": "0 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
