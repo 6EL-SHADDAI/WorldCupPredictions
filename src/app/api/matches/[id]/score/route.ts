@@ -117,51 +117,57 @@ export async function POST(req: NextRequest, { params }: Params) {
     )
 
     // Update prediction row
-    await db
-      .update(predictions)
-      .set({ score, maxPossibleScore, scored: true })
-      .where(eq(predictions.id, prediction.id))
+await db
+  .update(predictions)
+  .set({ score, maxPossibleScore, scored: true })
+  .where(eq(predictions.id, prediction.id))
 
-    // Upsert streak
-    const existingStreak = await db.query.streaks.findFirst({
-      where: eq(streaks.anonUserId, prediction.anonUserId),
-    })
+// Upsert streak
+const existingStreak = await db.query.streaks.findFirst({
+  where: eq(streaks.anonUserId, prediction.anonUserId),
+})
 
-    const { currentStreak, bestStreak } = updateStreakValues(
-      existingStreak?.currentStreak ?? 0,
-      existingStreak?.bestStreak ?? 0,
-      correctWinner
-    )
+const { currentStreak, bestStreak } = updateStreakValues(
+  existingStreak?.currentStreak ?? 0,
+  existingStreak?.bestStreak ?? 0,
+  correctWinner
+)
 
-    const newTotalScore = (existingStreak?.totalScore ?? 0) + score
-    const newTotalMax = (existingStreak?.totalMaxScore ?? 0) + maxPossibleScore
+const newTotalScore =
+  (existingStreak?.totalScore ?? 0) + score
 
-    await db
-      .insert(streaks)
-      .values({
-        anonUserId: prediction.anonUserId,
-        currentStreak,
-        bestStreak,
-        totalPredictions: 1,
-        totalCorrectWinner: correctWinner ? 1 : 0,
-        totalScore: score,
-        totalMaxScore: maxPossibleScore,
-        correctByKey: {},
-        lastScoredAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: streaks.anonUserId,
-        set: {
-          currentStreak,
-          bestStreak,
-          totalScore: newTotalScore,
-          totalMaxScore: newTotalMax,
-          totalCorrectWinner: db.$count(predictions) // placeholder; see note below
-            .sql`streaks.total_correct_winner + ${correctWinner ? 1 : 0}`,
-          lastScoredAt: new Date(),
-          updatedAt: new Date(),
-        },
-      })
+const newTotalMax =
+  (existingStreak?.totalMaxScore ?? 0) + maxPossibleScore
+
+const newTotalCorrectWinner =
+  (existingStreak?.totalCorrectWinner ?? 0) +
+  (correctWinner ? 1 : 0)
+
+await db
+  .insert(streaks)
+  .values({
+    anonUserId: prediction.anonUserId,
+    currentStreak,
+    bestStreak,
+    totalPredictions: 1,
+    totalCorrectWinner: correctWinner ? 1 : 0,
+    totalScore: score,
+    totalMaxScore: maxPossibleScore,
+    correctByKey: {},
+    lastScoredAt: new Date(),
+  })
+  .onConflictDoUpdate({
+    target: streaks.anonUserId,
+    set: {
+      currentStreak,
+      bestStreak,
+      totalScore: newTotalScore,
+      totalMaxScore: newTotalMax,
+      totalCorrectWinner: newTotalCorrectWinner,
+      lastScoredAt: new Date(),
+      updatedAt: new Date(),
+    },
+  })
 
     // Update Redis leaderboard
     await updateLeaderboard(prediction.anonUserId, newTotalScore).catch((e) =>
