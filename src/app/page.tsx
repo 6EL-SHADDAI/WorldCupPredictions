@@ -197,7 +197,10 @@ export default async function HomePage() {
 
   const live = allMatches.filter((m) => m.status === "live")
   const upcoming = allMatches.filter((m) => m.status === "scheduled")
-  const finished = allMatches.filter((m) => m.status === "finished")
+  //const finished = allMatches.filter((m) => m.status === "finished")      sort by most recent kickoffs first  
+  const finished = allMatches
+    .filter((m) => m.status === "finished")
+    .sort((a, b) => new Date(b.kickoffAt).getTime() - new Date(a.kickoffAt).getTime())
   const grouped = groupByDate(upcoming)
 
   return (
@@ -380,6 +383,36 @@ export default async function HomePage() {
   </div>
 </div>
 
+{/* Finished */}
+      {finished.length > 0 && (
+        <section style={{ marginBottom: 36 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 12,
+            }}
+          >
+            <span
+              className="display"
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "var(--chalk-faint)",
+              }}
+            >
+              Results
+            </span>
+            <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {finished.map((m) => <MatchCard key={m.id} match={m} />)}
+          </div>
+        </section>
+      )}
       {/* Live matches */}
       {live.length > 0 && (
         <section style={{ marginBottom: 40 }}>
@@ -432,36 +465,7 @@ export default async function HomePage() {
         </section>
       ))}
 
-      {/* Finished */}
-      {finished.length > 0 && (
-        <section style={{ marginBottom: 36 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 12,
-            }}
-          >
-            <span
-              className="display"
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                color: "var(--chalk-faint)",
-              }}
-            >
-              Results
-            </span>
-            <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {finished.map((m) => <MatchCard key={m.id} match={m} />)}
-          </div>
-        </section>
-      )}
+      
 
       {/* Empty state */}
       {allMatches.length === 0 && (

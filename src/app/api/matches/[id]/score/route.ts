@@ -143,31 +143,32 @@ const newTotalCorrectWinner =
   (existingStreak?.totalCorrectWinner ?? 0) +
   (correctWinner ? 1 : 0)
 
-await db
-  .insert(streaks)
-  .values({
-    anonUserId: prediction.anonUserId,
-    currentStreak,
-    bestStreak,
-    totalPredictions: 1,
-    totalCorrectWinner: correctWinner ? 1 : 0,
-    totalScore: score,
-    totalMaxScore: maxPossibleScore,
-    correctByKey: {},
-    lastScoredAt: new Date(),
-  })
-  .onConflictDoUpdate({
-    target: streaks.anonUserId,
-    set: {
-      currentStreak,
-      bestStreak,
-      totalScore: newTotalScore,
-      totalMaxScore: newTotalMax,
-      totalCorrectWinner: newTotalCorrectWinner,
-      lastScoredAt: new Date(),
-      updatedAt: new Date(),
-    },
-  })
+if (existingStreak) {
+      await db
+        .update(streaks)
+        .set({
+          currentStreak,
+          bestStreak,
+          totalScore: newTotalScore,
+          totalMaxScore: newTotalMax,
+          totalCorrectWinner: existingStreak.totalCorrectWinner + (correctWinner ? 1 : 0),
+          lastScoredAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(streaks.anonUserId, prediction.anonUserId))
+    } else {
+      await db.insert(streaks).values({
+        anonUserId: prediction.anonUserId,
+        currentStreak,
+        bestStreak,
+        totalPredictions: 1,
+        totalCorrectWinner: correctWinner ? 1 : 0,
+        totalScore: score,
+        totalMaxScore: maxPossibleScore,
+        correctByKey: {},
+        lastScoredAt: new Date(),
+      })
+    }
 
     // Update Redis leaderboard
     await updateLeaderboard(prediction.anonUserId, newTotalScore).catch((e) =>

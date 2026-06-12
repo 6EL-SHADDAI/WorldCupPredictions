@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import Nav from "@/components/ui/Nav"
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "Vibe Checker — 2026 World Cup",
