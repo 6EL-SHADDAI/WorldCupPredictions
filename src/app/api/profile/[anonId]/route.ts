@@ -93,6 +93,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     return NextResponse.json({
       anonUserId: anonId,
+      username: streak?.username ?? null,
       streak: streak
         ? {
             currentStreak: streak.currentStreak,

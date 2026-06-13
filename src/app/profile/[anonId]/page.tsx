@@ -33,6 +33,7 @@ type PredictionRecord = {
 }
 type ProfileData = {
   anonUserId: string
+  username: string | null
   streak: StreakData | null
   leaderboardRank: number | null
   accuracyByKey: Record<string, { correct: number; total: number }>
@@ -54,6 +55,10 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [isOwn, setIsOwn] = useState(false)
+  const [usernameInput, setUsernameInput] = useState("")
+  const [editingUsername, setEditingUsername] = useState(false)
+  const [usernameStatus, setUsernameStatus] = useState<"idle" | "saving" | "error">("idle")
+  const [usernameError, setUsernameError] = useState("")
 
   useEffect(() => {
     const myId = localStorage.getItem("vibe_uid")
@@ -63,6 +68,31 @@ export default function ProfilePage() {
       .then((data) => { setProfile(data); setLoading(false) })
       .catch(() => setLoading(false))
   }, [anonId])
+
+  async function saveUsername() {
+    const trimmed = usernameInput.trim()
+    setUsernameStatus("saving")
+    setUsernameError("")
+    try {
+      const res = await fetch("/api/username", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ anonUserId: anonId, username: trimmed || null }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setUsernameError(data.error ?? "Something went wrong.")
+        setUsernameStatus("error")
+        return
+      }
+      setProfile((prev) => (prev ? { ...prev, username: data.username } : prev))
+      setEditingUsername(false)
+      setUsernameStatus("idle")
+    } catch {
+      setUsernameError("Network error — try again.")
+      setUsernameStatus("error")
+    }
+  }
 
   if (loading) {
     return (
@@ -93,13 +123,76 @@ export default function ProfilePage() {
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 className="display" style={{ fontSize: 40, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.02em" }}>
-          {isOwn ? "Your" : "Their"} Record
+          {profile.username ?? (isOwn ? "Your" : "Their")}{!profile.username && " Record"}
         </h1>
         {leaderboardRank && (
           <div style={{ marginTop: 6 }}>
             <span className="badge badge-gold">#{leaderboardRank} on leaderboard</span>
           </div>
         )}
+
+        {isOwn && (
+          <div style={{ marginTop: 14 }}>
+            {!editingUsername ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 13, color: "var(--chalk-faint)" }}>
+                  {profile.username ? `Username: ${profile.username}` : "No username set"}
+                </span>
+                <button
+                  onClick={() => { setUsernameInput(profile.username ?? ""); setEditingUsername(true); setUsernameError("") }}
+                  className="btn-secondary"
+                  style={{ padding: "4px 14px", fontSize: 12 }}
+                >
+                  {profile.username ? "Change" : "Set a username"}
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, maxWidth: 320 }}>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    value={usernameInput}
+                    onChange={(e) => setUsernameInput(e.target.value)}
+                    placeholder="e.g. vibe_master"
+                    maxLength={20}
+                    style={{
+                      flex: 1,
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      border: "1px solid var(--line-bright)",
+                      background: "rgba(255,255,255,0.6)",
+                      color: "var(--chalk)",
+                      fontSize: 14,
+                    }}
+                  />
+                  <button onClick={saveUsername} disabled={usernameStatus === "saving"} className="btn-primary" style={{ padding: "8px 16px", fontSize: 13 }}>
+                    Save
+                  </button>
+                  <button onClick={() => { setEditingUsername(false); setUsernameError("") }} className="btn-secondary" style={{ padding: "8px 16px", fontSize: 13 }}>
+                    Cancel
+                  </button>
+                </div>
+                <span style={{ fontSize: 12, color: "var(--chalk-faint)" }}>
+                  3–20 characters: letters, numbers, underscores. Leave blank to remove your username.
+                </span>
+                {usernameError && (
+                  <span style={{ fontSize: 12, color: "var(--red-card)" }}>{usernameError}</span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Download result card */}
+        <div style={{ marginTop: 16 }}>
+          <a
+            href={`/api/profile/${anonId}/card`}
+            download={`vibe-checker-${profile.username ?? anonId.slice(0, 6)}.png`}
+            className="btn-primary"
+            style={{ display: "inline-flex" }}
+          >
+            📸 Download Result Card
+          </a>
+        </div>
       </div>
 
       {/* Stats row */}

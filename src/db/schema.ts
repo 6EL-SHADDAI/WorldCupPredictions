@@ -139,23 +139,31 @@ export const crowdTallies = pgTable(
 // ─── Streaks ──────────────────────────────────────────────────────────────────
 // One row per anon user. Updated atomically after each match is scored.
 
-export const streaks = pgTable("streaks", {
-  anonUserId: text("anon_user_id").primaryKey(),
-  currentStreak: integer("current_streak").notNull().default(0),
-  bestStreak: integer("best_streak").notNull().default(0),
-  totalPredictions: integer("total_predictions").notNull().default(0),
-  totalCorrectWinner: integer("total_correct_winner").notNull().default(0), // Q1 accuracy
-  totalScore: integer("total_score").notNull().default(0),
-  totalMaxScore: integer("total_max_score").notNull().default(0),
-  // Per question-type accuracy tracking
-  correctByKey: jsonb("correct_by_key")
-    .$type<Record<string, { correct: number; total: number }>>()
-    .notNull()
-    .default({}),
-  lastPredictedAt: timestamp("last_predicted_at", { withTimezone: true }),
-  lastScoredAt: timestamp("last_scored_at", { withTimezone: true }),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-})
+export const streaks = pgTable(
+  "streaks",
+  {
+    anonUserId: text("anon_user_id").primaryKey(),
+    username: text("username"), // optional display name, user-chosen
+    usernameLower: text("username_lower"), // lowercase, for case-insensitive uniqueness
+    currentStreak: integer("current_streak").notNull().default(0),
+    bestStreak: integer("best_streak").notNull().default(0),
+    totalPredictions: integer("total_predictions").notNull().default(0),
+    totalCorrectWinner: integer("total_correct_winner").notNull().default(0), // Q1 accuracy
+    totalScore: integer("total_score").notNull().default(0),
+    totalMaxScore: integer("total_max_score").notNull().default(0),
+    // Per question-type accuracy tracking
+    correctByKey: jsonb("correct_by_key")
+      .$type<Record<string, { correct: number; total: number }>>()
+      .notNull()
+      .default({}),
+    lastPredictedAt: timestamp("last_predicted_at", { withTimezone: true }),
+    lastScoredAt: timestamp("last_scored_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    usernameLowerUniq: uniqueIndex("streaks_username_lower_uniq").on(t.usernameLower),
+  })
+)
 
 // ─── Relations ────────────────────────────────────────────────────────────────
 
