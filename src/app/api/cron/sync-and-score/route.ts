@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db"
 import { matches, questions } from "@/db/schema"
-import { eq } from "drizzle-orm"
+import { eq, and, isNull } from "drizzle-orm"
 import { getWorldCupMatches } from "@/lib/football-api"
-import { getQuestionsForStage, QUESTION_TEMPLATES } from "@/lib/questions"
+import { getQuestionsForStage } from "@/lib/questions"
 import { lockMatch } from "@/lib/redis"
+import { scoreMatch } from "@/lib/scoreMatch"
 
 function isCronAuthorised(req: NextRequest): boolean {
   const authHeader = req.headers.get("authorization")
-  return authHeader === `Bearer ${process.env.CRON_SECRET}`
+  if (authHeader === `Bearer ${process.env.CRON_SECRET}`) return true
+  // Fallback: ?secret=... so external cron services (cron-job.org) or a
+  // browser can trigger this without setting custom headers.
+  const secretParam = req.nextUrl.searchParams.get("secret")
+  return secretParam === process.env.CRON_SECRET
 }
 
 export async function GET(req: NextRequest) {
@@ -17,6 +22,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // ── 1. Sync matches from football-data.org ────────────────────────────
     const liveMatches = await getWorldCupMatches()
     let created = 0
     let updated = 0
@@ -40,6 +46,11 @@ export async function GET(req: NextRequest) {
             stage: liveMatch.stage as any,
             status: liveMatch.status as any,
             kickoffAt: liveMatch.kickoffAt,
+            homeScore: liveMatch.homeScore,
+            awayScore: liveMatch.awayScore,
+            winner: liveMatch.winner,
+            wentToExtraTime: liveMatch.wentToExtraTime,
+            wentToPenalties: liveMatch.wentToPenalties,
           })
           .returning()
 
@@ -97,9 +108,32 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, created, updated, locked })
+    // ── 2. Find all finished-but-unscored matches and score them now ───────
+    const unscored = await db
+      .select({ id: matches.id })
+      .from(matches)
+      .where(and(eq(matches.status, "finished"), isNull(matches.scoredAt)))
+
+    const scoreResults: Array<{ matchId: string; result: string }> = []
+
+    for (const m of unscored) {
+      const result = await scoreMatch(m.id)
+      if (!result.ok) {
+        scoreResults.push({ matchId: m.id, result: `error: ${result.error}` })
+      } else if (result.skipped) {
+        scoreResults.push({ matchId: m.id, result: result.reason })
+      } else {
+        scoreResults.push({ matchId: m.id, result: `scored ${result.predictionsScored}` })
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      sync: { created, updated, locked, totalFromApi: liveMatches.length },
+      scoring: { processed: scoreResults.length, results: scoreResults },
+    })
   } catch (err) {
-    console.error("[cron/sync-matches]", err)
-    return NextResponse.json({ error: "Sync failed", detail: String(err) }, { status: 500 })
+    console.error("[cron/sync-and-score]", err)
+    return NextResponse.json({ error: "Sync/score failed", detail: String(err) }, { status: 500 })
   }
 }

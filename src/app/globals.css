@@ -5,18 +5,18 @@
 @tailwind utilities;
 
 :root {
-  /* Palette */
-  --pitch: #0a0e0a;           /* near-black with green tint — the pitch at night */
-  --turf: #0f1a0f;            /* slightly lighter surface */
-  --line: #1a2e1a;            /* pitch markings — subtle borders */
-  --line-bright: #2a4a2a;     /* brighter borders on hover */
-  --grass: #2d7a2d;           /* accent — grass green */
-  --grass-bright: #3aaa3a;    /* hover state */
-  --gold: #e8c14a;            /* streak / highlight gold */
-  --red-card: #e03535;        /* danger / wrong */
-  --chalk: #f0f0e8;           /* primary text — slightly warm white */
-  --chalk-dim: #9a9e92;       /* secondary text */
-  --chalk-faint: #4a5044;     /* muted text */
+  /* Palette — white pitch theme */
+  --pitch: #ffffff;            /* page background — clean white */
+  --turf: #f4f9f3;             /* card surface — faint green tint */
+  --line: #d8e8d4;             /* subtle borders */
+  --line-bright: #a8d0a0;      /* brighter borders on hover */
+  --grass: #2d7a2d;            /* accent — grass green */
+  --grass-bright: #3aaa3a;     /* hover state */
+  --gold: #b8860b;             /* streak / highlight gold (darker for contrast on white) */
+  --red-card: #d92b2b;         /* danger / wrong */
+  --chalk: #16201a;            /* primary text — near-black green-grey */
+  --chalk-dim: #5a6b58;        /* secondary text */
+  --chalk-faint: #a3b3a0;      /* muted text */
 
   /* Typography */
   --font-display: 'Barlow Condensed', sans-serif;
@@ -28,12 +28,17 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--pitch);
+  background: transparent;
   color: var(--chalk);
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+html {
+  background: var(--pitch);
 }
 
 /* Scrollbar */
@@ -41,13 +46,8 @@ body {
 ::-webkit-scrollbar-track { background: var(--pitch); }
 ::-webkit-scrollbar-thumb { background: var(--line-bright); border-radius: 3px; }
 
-/* Pitch grid background — subtle lines like a football pitch */
-.pitch-bg {
-  background-image:
-    linear-gradient(rgba(45, 122, 45, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(45, 122, 45, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
+/* Legacy grid class — no-op now that the ferrofluid covers the background */
+.pitch-bg {}
 
 /* Display type utility */
 .display { font-family: var(--font-display); }
@@ -67,14 +67,21 @@ body {
   border-radius: 1px;
 }
 
-/* Card base */
+/* Card base — glossy green glass */
 .card {
-  background: var(--turf);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  transition: border-color 0.15s;
+  background: rgba(45, 122, 45, 0.08);
+  border: 1px solid rgba(45, 122, 45, 0.18);
+  border-radius: 14px;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: 0 4px 24px rgba(45, 122, 45, 0.08), inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
 }
-.card:hover { border-color: var(--line-bright); }
+.card:hover {
+  border-color: rgba(45, 122, 45, 0.35);
+  background: rgba(45, 122, 45, 0.13);
+  transform: translateY(-1px);
+}
 
 /* Badge */
 .badge {
@@ -88,10 +95,10 @@ body {
   padding: 3px 8px;
   border-radius: 4px;
 }
-.badge-live { background: rgba(224, 53, 53, 0.15); color: var(--red-card); }
-.badge-upcoming { background: rgba(45, 122, 45, 0.15); color: var(--grass-bright); }
-.badge-finished { background: rgba(74, 80, 68, 0.4); color: var(--chalk-dim); }
-.badge-gold { background: rgba(232, 193, 74, 0.15); color: var(--gold); }
+.badge-live { background: rgba(217, 43, 43, 0.1); color: var(--red-card); }
+.badge-upcoming { background: rgba(45, 122, 45, 0.1); color: var(--grass); }
+.badge-finished { background: rgba(90, 107, 88, 0.12); color: var(--chalk-dim); }
+.badge-gold { background: rgba(184, 134, 11, 0.12); color: var(--gold); }
 
 /* Button */
 .btn-primary {
@@ -100,7 +107,7 @@ body {
   justify-content: center;
   gap: 8px;
   background: var(--grass);
-  color: var(--chalk);
+  color: #ffffff;
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
@@ -136,7 +143,7 @@ body {
   transition: border-color 0.15s, color 0.15s;
   text-decoration: none;
 }
-.btn-secondary:hover { border-color: var(--chalk-dim); color: var(--chalk); }
+.btn-secondary:hover { border-color: var(--grass); color: var(--grass); }
 
 /* Progress bar */
 .progress-bar {

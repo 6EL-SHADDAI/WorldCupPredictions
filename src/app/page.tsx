@@ -3,7 +3,6 @@ import { db } from "@/db"
 import { matches } from "@/db/schema"
 import { asc } from "drizzle-orm"
 import type { Match } from "@/db/schema"
-import Ferrofluid from "@/components/ui/Ferrofluid"
 
 export const revalidate = 60
 
@@ -217,33 +216,6 @@ export default async function HomePage() {
     minHeight: 300,
   }}
 >
-  {/* Ferrofluid background */}
-  <div
-    style={{
-      position: "absolute",
-      inset: 0,
-      zIndex: 0,
-      pointerEvents: "none",
-    }}
-  >
-    <Ferrofluid
-      colors={["#2d7a2d", "#3aaa3a", "#0f1a0f"]}
-      speed={0.3}
-      scale={1.6}
-      turbulence={0.8}
-      fluidity={0.15}
-      rimWidth={0.2}
-      sharpness={2.5}
-      shimmer={1.5}
-      glow={2}
-      flowDirection="down"
-      opacity={0.6}
-      mouseInteraction={true}
-      mouseStrength={1}
-      mouseRadius={0.35}
-    />
-  </div>
-
   {/* Hero content */}
   <div
     style={{
