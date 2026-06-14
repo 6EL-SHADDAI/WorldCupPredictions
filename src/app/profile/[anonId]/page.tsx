@@ -183,16 +183,18 @@ export default function ProfilePage() {
         )}
 
         {/* Download result card */}
-        <div style={{ marginTop: 16 }}>
-          <a
-            href={`/api/profile/${anonId}/card`}
-            download={`vibe-checker-${profile.username ?? anonId.slice(0, 6)}.png`}
-            className="btn-primary"
-            style={{ display: "inline-flex" }}
-          >
-            📸 Download Result Card
-          </a>
-        </div>
+        {isOwn && (
+          <div style={{ marginTop: 16 }}>
+            <a
+              href={`/api/profile/${anonId}/card`}
+              download={`vibe-checker-${profile.username ?? anonId.slice(0, 6)}.png`}
+              className="btn-primary"
+              style={{ display: "inline-flex" }}
+            >
+              📸 Download Result Card
+            </a>
+          </div>
+        )}
       </div>
 
       {/* Stats row */}

@@ -3,7 +3,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* check tailwind*/
 :root {
   /* Palette — white pitch theme */
   --pitch: #ffffff;            /* page background — clean white */
