@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db"
-import { questions, matches } from "@/db/schema"
-import { eq, asc } from "drizzle-orm"
+import { questions, matches, predictions } from "@/db/schema"
+import { eq, asc, and } from "drizzle-orm"
 
 type Params = { params: Promise<{ id: string }> }
 
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: Params) {
   const { id } = await params
+  const anonUserId = req.nextUrl.searchParams.get("anonUserId")
 
   try {
-    // Fetch match + its questions in parallel
     const [match, matchQuestions] = await Promise.all([
       db.query.matches.findFirst({ where: eq(matches.id, id) }),
       db
@@ -26,9 +26,27 @@ export async function GET(_req: NextRequest, { params }: Params) {
     // Strip correctAnswer from response — only expose after match is finished
     const safeQuestions = matchQuestions.map(({ correctAnswer, ...q }) => ({
       ...q,
-      // Reveal correct answer only if match is finished
       correctAnswer: match.status === "finished" ? correctAnswer : undefined,
     }))
+
+    // Look up the user's existing prediction for this match, if any
+    let myPrediction = null
+    if (anonUserId) {
+      const existing = await db.query.predictions.findFirst({
+        where: and(eq(predictions.matchId, id), eq(predictions.anonUserId, anonUserId)),
+      })
+      if (existing) {
+        myPrediction = {
+          id: existing.id,
+          answers: existing.answers,
+          confidence: existing.confidence,
+          score: existing.score,
+          maxPossibleScore: existing.maxPossibleScore,
+          scored: existing.scored,
+          createdAt: existing.createdAt,
+        }
+      }
+    }
 
     return NextResponse.json({
       match: {
@@ -44,6 +62,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
         awayScore: match.status === "finished" ? match.awayScore : null,
       },
       questions: safeQuestions,
+      myPrediction,
     })
   } catch (err) {
     console.error(`[GET /api/matches/${id}/questions]`, err)

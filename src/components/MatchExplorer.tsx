@@ -2,6 +2,7 @@
 import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
 import type { Match } from "@/db/schema"
+import { flagUrl } from "@/lib/flags"
 
 function useNow(intervalMs = 10000) {
   const [now, setNow] = useState(() => Date.now())
@@ -10,6 +11,22 @@ function useNow(intervalMs = 10000) {
     return () => clearInterval(t)
   }, [intervalMs])
   return now
+}
+
+function usePredictedSet() {
+  const [predicted, setPredicted] = useState<Set<string>>(new Set())
+  useEffect(() => {
+    const uid = localStorage.getItem("vibe_uid")
+    if (!uid) return
+    fetch(`/api/profile/${uid}`)
+      .then((r) => r.json())
+      .then((d) => {
+        const ids = (d.predictions ?? []).map((p: { matchId: string }) => p.matchId)
+        setPredicted(new Set(ids))
+      })
+      .catch(() => {})
+  }, [])
+  return predicted
 }
 
 function formatKickoff(date: Date | string): string {
@@ -39,85 +56,154 @@ function CountdownBadge({ kickoffAt }: { kickoffAt: Date | string }) {
   const totalMins = Math.floor(ms / 60000)
   const hours = Math.floor(totalMins / 60)
   const mins = totalMins % 60
-
   const isUrgent = totalMins <= 60
 
   let label = ""
-  if (hours > 0) label = `${hours}h ${mins}m to predict`
-  else if (totalMins > 0) label = `${mins}m to predict!`
+  if (hours > 0) label = `${hours}h ${mins}m left`
+  else if (totalMins > 0) label = `${mins}m left!`
 
   return (
-    <span
-      className={isUrgent ? "badge badge-live" : "badge badge-upcoming"}
-      style={isUrgent ? { animation: "none" } : undefined}
-    >
+    <span className={isUrgent ? "badge badge-live" : "badge badge-upcoming"}>
       {isUrgent && <span className="pulse">⏱</span>} {label}
     </span>
   )
 }
 
-function MatchCard({ match }: { match: Match }) {
+function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolean }) {
   const isFinished = match.status === "finished"
   const isLive = match.status === "live"
+  const homeFlag = flagUrl(match.homeTeamCode, 320)
+  const awayFlag = flagUrl(match.awayTeamCode, 320)
 
   return (
     <Link href={`/match/${match.id}`} style={{ textDecoration: "none" }}>
       <div
         className="card"
         style={{
-          padding: "16px 20px",
+          position: "relative",
+          overflow: "hidden",
           cursor: "pointer",
-          display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
-          alignItems: "center",
-          gap: 16,
+          minHeight: 150,
         }}
       >
-        {/* Home */}
-        <div style={{ textAlign: "right" }}>
-          <div className="display" style={{ fontSize: 20, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.03em", color: "var(--chalk)" }}>
-            {match.homeTeam}
+        {/* Split flag backgrounds */}
+        <div style={{ position: "absolute", inset: 0, display: "flex" }}>
+          <div
+            style={{
+              flex: 1,
+              backgroundImage: homeFlag ? `url(${homeFlag})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              position: "relative",
+            }}
+          >
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.88) 100%)" }} />
           </div>
-          <div style={{ fontSize: 12, color: "var(--chalk-faint)", fontWeight: 600, letterSpacing: "0.08em" }}>
-            {match.homeTeamCode}
+          <div
+            style={{
+              flex: 1,
+              backgroundImage: awayFlag ? `url(${awayFlag})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              position: "relative",
+            }}
+          >
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.78) 100%)" }} />
           </div>
         </div>
 
-        {/* Centre */}
-        <div style={{ textAlign: "center", minWidth: 110 }}>
-          {isFinished ? (
-            <div className="display" style={{ fontSize: 32, fontWeight: 900, letterSpacing: "0.06em", color: "var(--chalk)", lineHeight: 1 }}>
-              {match.homeScore} <span style={{ color: "var(--chalk-faint)" }}>–</span> {match.awayScore}
+        {/* Content */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            padding: "18px 20px 14px",
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
+            alignItems: "center",
+            gap: 16,
+            backdropFilter: "blur(2px)",
+          }}
+        >
+          <div style={{ textAlign: "right" }}>
+            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>
+              {match.homeTeam}
             </div>
-          ) : isLive ? (
-            <div className="display" style={{ fontSize: 20, fontWeight: 900, letterSpacing: "0.06em", color: "var(--red-card)", lineHeight: 1 }}>
-              LIVE
+            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em" }}>
+              {match.homeTeamCode}
+            </div>
+          </div>
+
+          <div style={{ textAlign: "center", minWidth: 100 }}>
+            {isFinished ? (
+              <div className="display" style={{ fontSize: 30, fontWeight: 900, letterSpacing: "0.06em", color: "var(--chalk)", lineHeight: 1, textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>
+                {match.homeScore} <span style={{ color: "var(--chalk-faint)" }}>–</span> {match.awayScore}
+              </div>
+            ) : isLive ? (
+              <div className="display" style={{ fontSize: 18, fontWeight: 900, letterSpacing: "0.06em", color: "var(--red-card)" }}>LIVE</div>
+            ) : (
+              <div className="display" style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.1em", color: "var(--chalk-dim)" }}>VS</div>
+            )}
+            <div style={{ marginTop: 5, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+              {isFinished && <span className="badge badge-finished">Full Time</span>}
+              {isLive && <span className="badge badge-live"><span className="pulse">●</span> Live</span>}
+              {!isFinished && !isLive && (
+                <>
+                  <div style={{ fontSize: 10, color: "var(--chalk-dim)" }}>{formatKickoff(match.kickoffAt)}</div>
+                  <CountdownBadge kickoffAt={match.kickoffAt} />
+                </>
+              )}
+            </div>
+          </div>
+
+          <div style={{ textAlign: "left" }}>
+            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>
+              {match.awayTeam}
+            </div>
+            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em" }}>
+              {match.awayTeamCode}
+            </div>
+          </div>
+        </div>
+
+        {/* Glass action button */}
+        <div style={{ position: "relative", zIndex: 1, padding: "0 20px 16px", display: "flex", justifyContent: "center" }}>
+          {isFinished ? (
+            <div
+              style={{
+                background: "rgba(255,255,255,0.55)", backdropFilter: "blur(10px)",
+                border: "1px solid rgba(45,122,45,0.25)", borderRadius: 999,
+                padding: "7px 22px", fontSize: 12, fontWeight: 700,
+                color: "var(--grass)", textTransform: "uppercase", letterSpacing: "0.06em",
+              }}
+            >
+              {hasPredicted ? "📊 View Your Result" : "📊 View Results"}
+            </div>
+          ) : hasPredicted ? (
+            <div
+              style={{
+                background: "rgba(45,122,45,0.18)", backdropFilter: "blur(10px)",
+                border: "1px solid rgba(45,122,45,0.4)", borderRadius: 999,
+                padding: "7px 22px", fontSize: 12, fontWeight: 700,
+                color: "var(--grass-bright)", textTransform: "uppercase", letterSpacing: "0.06em",
+                display: "flex", alignItems: "center", gap: 6,
+              }}
+            >
+              ✓ Prediction Locked In
             </div>
           ) : (
-            <div className="display" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", color: "var(--chalk-faint)" }}>
-              VS
+            <div
+              style={{
+                background: "rgba(255,255,255,0.6)", backdropFilter: "blur(10px)",
+                border: "1px solid rgba(45,122,45,0.35)", borderRadius: 999,
+                padding: "8px 26px", fontSize: 13, fontWeight: 800,
+                color: "var(--grass)", textTransform: "uppercase", letterSpacing: "0.06em",
+                boxShadow: "0 2px 12px rgba(45,122,45,0.15)",
+              }}
+            >
+              ⚽ Predict This Match
             </div>
           )}
-          <div style={{ marginTop: 6, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-            {isFinished && <span className="badge badge-finished">Full Time</span>}
-            {isLive && <span className="badge badge-live"><span className="pulse">●</span> Live</span>}
-            {!isFinished && !isLive && (
-              <>
-                <div style={{ fontSize: 11, color: "var(--chalk-faint)" }}>{formatKickoff(match.kickoffAt)}</div>
-                <CountdownBadge kickoffAt={match.kickoffAt} />
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Away */}
-        <div style={{ textAlign: "left" }}>
-          <div className="display" style={{ fontSize: 20, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.03em", color: "var(--chalk)" }}>
-            {match.awayTeam}
-          </div>
-          <div style={{ fontSize: 12, color: "var(--chalk-faint)", fontWeight: 600, letterSpacing: "0.08em" }}>
-            {match.awayTeamCode}
-          </div>
         </div>
       </div>
     </Link>
@@ -138,6 +224,7 @@ function SectionHeader({ label }: { label: string }) {
 export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
   const [query, setQuery] = useState("")
   const q = query.trim().toLowerCase()
+  const predicted = usePredictedSet()
 
   const filtered = useMemo(() => {
     if (!q) return allMatches
@@ -160,7 +247,7 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
   const noResults = isSearching && filtered.length === 0
 
   return (
-    <div>
+    <div data-match-explorer>
       {/* Search */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ position: "relative" }}>
@@ -169,15 +256,9 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="🔍 Search — Brazil, ARG, Japan..."
             style={{
-              width: "100%",
-              padding: "14px 18px",
-              borderRadius: 12,
-              border: "1px solid var(--line-bright)",
-              background: "rgba(255,255,255,0.55)",
-              backdropFilter: "blur(10px)",
-              color: "var(--chalk)",
-              fontSize: 15,
-              outline: "none",
+              width: "100%", padding: "14px 18px", borderRadius: 12,
+              border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.55)",
+              backdropFilter: "blur(10px)", color: "var(--chalk)", fontSize: 15, outline: "none",
             }}
           />
           {query && (
@@ -199,9 +280,9 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
       {isSearching && filtered.length > 0 && (
         <section style={{ marginBottom: 36 }}>
           <SectionHeader label={`${filtered.length} match${filtered.length === 1 ? "" : "es"} found`} />
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {[...filtered].sort((a, b) => new Date(a.kickoffAt).getTime() - new Date(b.kickoffAt).getTime())
-              .map((m) => <MatchCard key={m.id} match={m} />)}
+              .map((m) => <MatchCard key={m.id} match={m} hasPredicted={predicted.has(m.id)} />)}
           </div>
         </section>
       )}
@@ -211,8 +292,8 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
           {live.length > 0 && (
             <section style={{ marginBottom: 40 }}>
               <SectionHeader label="🔴 Live Now" />
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {live.map((m) => <MatchCard key={m.id} match={m} />)}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {live.map((m) => <MatchCard key={m.id} match={m} hasPredicted={predicted.has(m.id)} />)}
               </div>
             </section>
           )}
@@ -220,8 +301,8 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
           {finished.length > 0 && (
             <section style={{ marginBottom: 36 }}>
               <SectionHeader label="Results" />
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {finished.map((m) => <MatchCard key={m.id} match={m} />)}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {finished.map((m) => <MatchCard key={m.id} match={m} hasPredicted={predicted.has(m.id)} />)}
               </div>
             </section>
           )}
@@ -229,8 +310,8 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
           {Object.entries(grouped).map(([date, dateMatches]) => (
             <section key={date} style={{ marginBottom: 36 }}>
               <SectionHeader label={date} />
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {dateMatches.map((m) => <MatchCard key={m.id} match={m} />)}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {dateMatches.map((m) => <MatchCard key={m.id} match={m} hasPredicted={predicted.has(m.id)} />)}
               </div>
             </section>
           ))}
