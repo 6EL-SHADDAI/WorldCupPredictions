@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 const links = [
   { href: "/", label: "Matches" },
   { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/upsets", label: "Upsets" },
+  { href: "/hot-takes", label: "Hot Takes" },
 ]
 
 export default function Nav() {

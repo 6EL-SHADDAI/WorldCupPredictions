@@ -183,8 +183,10 @@ export const userBadges = pgTable(
 )
 
 // ─── Friends ──────────────────────────────────────────────────────────────────
-// Simple directional follow — if both follow each other, they're "friends" for
-// leaderboard purposes. We keep it one-way so it's easy to add later.
+// Directional friend request. status: "pending" (sent, awaiting accept) or
+// "accepted" (mutual — both directions exist once accepted).
+
+export const friendStatusEnum = pgEnum("friend_status", ["pending", "accepted"])
 
 export const friends = pgTable(
   "friends",
@@ -192,12 +194,47 @@ export const friends = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     fromUserId: text("from_user_id").notNull(),
     toUserId: text("to_user_id").notNull(),
+    status: friendStatusEnum("status").notNull().default("pending"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    respondedAt: timestamp("responded_at", { withTimezone: true }),
   },
   (t) => ({
     friendUniq: uniqueIndex("friends_uniq").on(t.fromUserId, t.toUserId),
     fromIdx: index("friends_from_idx").on(t.fromUserId),
     toIdx: index("friends_to_idx").on(t.toUserId),
+  })
+)
+
+// ─── Hot Takes ────────────────────────────────────────────────────────────────
+// Admin-posted opinions/predictions the community votes Agree/Disagree on.
+
+export const hotTakes = pgTable(
+  "hot_takes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    text: text("text").notNull(),
+    category: text("category"), // e.g. "bold prediction", "controversial", "stats"
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  }
+)
+
+export const hotTakeVoteEnum = pgEnum("hot_take_vote", ["agree", "disagree"])
+
+export const hotTakeVotes = pgTable(
+  "hot_take_votes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    hotTakeId: uuid("hot_take_id")
+      .notNull()
+      .references(() => hotTakes.id, { onDelete: "cascade" }),
+    anonUserId: text("anon_user_id").notNull(),
+    vote: hotTakeVoteEnum("vote").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    voteUniq: uniqueIndex("hot_take_votes_uniq").on(t.hotTakeId, t.anonUserId),
+    takeIdx: index("hot_take_votes_take_idx").on(t.hotTakeId),
   })
 )
 
@@ -233,3 +270,5 @@ export type CrowdTally = typeof crowdTallies.$inferSelect
 export type Streak = typeof streaks.$inferSelect
 export type UserBadge = typeof userBadges.$inferSelect
 export type Friend = typeof friends.$inferSelect
+export type HotTake = typeof hotTakes.$inferSelect
+export type HotTakeVote = typeof hotTakeVotes.$inferSelect
