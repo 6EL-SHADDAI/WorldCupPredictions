@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const links = [
   { href: "/", label: "Matches" },
@@ -9,11 +9,49 @@ const links = [
   { href: "/hot-takes", label: "Hot Takes" },
 ]
 
+function NavPill({ href, label, active }: { href: string; label: string; active: boolean }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: 36,
+        padding: "0 18px",
+        borderRadius: 999,
+        fontFamily: "var(--font-display)",
+        fontSize: 13,
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: "0.05em",
+        whiteSpace: "nowrap",
+        textDecoration: "none",
+        color: active || hovered ? "#ffffff" : "var(--chalk-dim)",
+        background: active
+          ? "var(--grass)"
+          : hovered
+          ? "var(--grass)"
+          : "transparent",
+        transition: "background 0.28s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s ease",
+        overflow: "hidden",
+      }}
+    >
+      {label}
+    </Link>
+  )
+}
+
 export default function Nav() {
   const pathname = usePathname()
   const [anonId, setAnonId] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     const uid = localStorage.getItem("vibe_uid")
@@ -28,10 +66,10 @@ export default function Nav() {
   return (
     <nav
       style={{
-        background: "rgba(255,255,255,0.82)",
-        borderBottom: "1px solid var(--line)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        background: "rgba(255,255,255,0.55)",
+        borderBottom: "1px solid rgba(45,122,45,0.12)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
         position: "sticky",
         top: 0,
         zIndex: 50,
@@ -41,8 +79,7 @@ export default function Nav() {
         style={{
           maxWidth: 1100,
           margin: "0 auto",
-          padding: "0 20px",
-          height: 56,
+          padding: "10px 20px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -54,44 +91,38 @@ export default function Nav() {
           <span
             className="display"
             style={{
-              fontSize: 22,
+              fontSize: 21,
               fontWeight: 800,
-              letterSpacing: "0.02em",
-              textTransform: "uppercase",
+              letterSpacing: "-0.01em",
               color: "var(--chalk)",
             }}
           >
-            ⚽ Vibe<span style={{ color: "var(--grass)" }}>Checker</span>
+            UKNOW<span style={{ color: "var(--grass)" }}>BALL</span>
+            <span style={{ color: "var(--chalk-faint)", fontWeight: 600 }}>?</span>
           </span>
         </Link>
 
-        {/* Nav links */}
-        <div style={{ display: "flex", gap: 2, flex: 1, justifyContent: "center" }}>
-          {links.map((link) => {
-            const active = pathname === link.href
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  padding: "6px 12px",
-                  borderRadius: 6,
-                  color: active ? "var(--chalk)" : "var(--chalk-dim)",
-                  background: active ? "rgba(45,122,45,0.1)" : "transparent",
-                  textDecoration: "none",
-                  transition: "color 0.15s, background 0.15s",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {link.label}
-              </Link>
-            )
-          })}
+        {/* Desktop glass pill nav + My Stats together */}
+        <div
+          className="glass-pill-track"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 3,
+            padding: 3,
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.5)",
+            border: "1px solid rgba(45,122,45,0.15)",
+            backdropFilter: "blur(10px)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 12px rgba(45,122,45,0.06)",
+          }}
+        >
+          {links.map((link) => (
+            <NavPill key={link.href} href={link.href} label={link.label} active={pathname === link.href} />
+          ))}
+          {anonId && (
+            <NavPill href={`/profile/${anonId}`} label="My Stats" active={pathname === `/profile/${anonId}`} />
+          )}
         </div>
 
         {/* User corner */}
@@ -103,70 +134,54 @@ export default function Nav() {
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                background: "rgba(45,122,45,0.08)",
-                border: "1px solid var(--line-bright)",
-                borderRadius: 8,
-                padding: "6px 12px",
+                background: "rgba(45,122,45,0.1)",
+                border: "1px solid rgba(45,122,45,0.2)",
+                borderRadius: 999,
+                padding: "6px 14px",
                 cursor: "pointer",
                 color: "var(--chalk)",
                 fontSize: 13,
                 fontWeight: 600,
+                backdropFilter: "blur(8px)",
               }}
             >
-              <span style={{ fontSize: 16 }}>👤</span>
-              <span style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {username ? `@${username}` : "My Profile"}
+              <span style={{ fontSize: 15 }}>👤</span>
+              <span style={{ maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {username ? `@${username}` : "Profile"}
               </span>
-              <span style={{ fontSize: 10, color: "var(--chalk-faint)" }}>▾</span>
+              <span style={{ fontSize: 9, color: "var(--chalk-faint)" }}>▾</span>
             </button>
 
             {menuOpen && (
               <>
-                {/* backdrop */}
-                <div
-                  onClick={() => setMenuOpen(false)}
-                  style={{ position: "fixed", inset: 0, zIndex: 40 }}
-                />
+                <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
                 <div
                   style={{
                     position: "absolute",
                     top: "calc(100% + 8px)",
                     right: 0,
-                    background: "rgba(255,255,255,0.95)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid var(--line-bright)",
-                    borderRadius: 10,
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.10)",
-                    minWidth: 180,
+                    background: "rgba(255,255,255,0.9)",
+                    backdropFilter: "blur(20px) saturate(180%)",
+                    border: "1px solid rgba(45,122,45,0.15)",
+                    borderRadius: 14,
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
+                    minWidth: 190,
                     zIndex: 50,
                     overflow: "hidden",
                   }}
                 >
                   {username && (
-                    <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", fontSize: 12, color: "var(--chalk-faint)" }}>
+                    <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(45,122,45,0.1)", fontSize: 12, color: "var(--chalk-faint)" }}>
                       Signed in as <strong style={{ color: "var(--chalk)" }}>@{username}</strong>
                     </div>
                   )}
-                  <Link
-                    href={`/profile/${anonId}`}
-                    onClick={() => setMenuOpen(false)}
-                    style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500 }}
-                  >
+                  <Link href={`/profile/${anonId}`} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500 }}>
                     📊 My Stats
                   </Link>
-                  <Link
-                    href={`/leaderboard?tab=friends`}
-                    onClick={() => setMenuOpen(false)}
-                    style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500 }}
-                  >
+                  <Link href={`/leaderboard?tab=friends`} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500 }}>
                     👥 Friends Board
                   </Link>
-                  <Link
-                    href={`/api/profile/${anonId}/card`}
-                    download
-                    onClick={() => setMenuOpen(false)}
-                    style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500, borderTop: "1px solid var(--line)" }}
-                  >
+                  <Link href={`/api/profile/${anonId}/card`} download onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500, borderTop: "1px solid rgba(45,122,45,0.1)" }}>
                     📸 Download Card
                   </Link>
                 </div>
@@ -174,27 +189,79 @@ export default function Nav() {
             )}
           </div>
         ) : (
-          <div style={{ fontSize: 12, color: "var(--chalk-faint)", flexShrink: 0 }}>
-            Predict to join
-          </div>
+          <div style={{ fontSize: 12, color: "var(--chalk-faint)", flexShrink: 0 }}>Predict to join</div>
         )}
-      </div>
 
-      {/* Welcome back banner — only shows once per session */}
-      {username && pathname === "/" && (
-        <div
+        {/* Mobile hamburger */}
+        <button
+          className="mobile-nav-toggle"
+          onClick={() => setMobileOpen((o) => !o)}
           style={{
-            background: "rgba(45,122,45,0.07)",
-            borderBottom: "1px solid var(--line)",
-            padding: "6px 20px",
-            textAlign: "center",
-            fontSize: 13,
-            color: "var(--chalk-dim)",
+            display: "none",
+            width: 38, height: 38, borderRadius: 999,
+            background: "rgba(45,122,45,0.1)", border: "1px solid rgba(45,122,45,0.2)",
+            alignItems: "center", justifyContent: "center", cursor: "pointer",
           }}
         >
-          Welcome back, <strong style={{ color: "var(--grass)" }}>@{username}</strong> ⚽ Make your predictions before kickoff!
+          <span style={{ fontSize: 18 }}>{mobileOpen ? "✕" : "☰"}</span>
+        </button>
+      </div>
+
+      {/* Mobile dropdown */}
+      {mobileOpen && (
+        <div
+          className="mobile-nav-panel"
+          style={{
+            display: "none",
+            padding: "8px 16px 16px",
+            background: "rgba(255,255,255,0.85)",
+            backdropFilter: "blur(20px)",
+            borderTop: "1px solid rgba(45,122,45,0.1)",
+          }}
+        >
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "block", padding: "12px 14px", borderRadius: 10,
+                fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14,
+                textTransform: "uppercase", letterSpacing: "0.05em",
+                color: pathname === link.href ? "#fff" : "var(--chalk)",
+                background: pathname === link.href ? "var(--grass)" : "transparent",
+                textDecoration: "none", marginBottom: 4,
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {anonId && (
+            <Link
+              href={`/profile/${anonId}`}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "block", padding: "12px 14px", borderRadius: 10,
+                fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14,
+                textTransform: "uppercase", letterSpacing: "0.05em",
+                color: pathname === `/profile/${anonId}` ? "#fff" : "var(--chalk)",
+                background: pathname === `/profile/${anonId}` ? "var(--grass)" : "transparent",
+                textDecoration: "none",
+              }}
+            >
+              My Stats
+            </Link>
+          )}
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 720px) {
+          .glass-pill-track { display: none !important; }
+          .mobile-nav-toggle { display: flex !important; }
+          .mobile-nav-panel { display: block !important; }
+        }
+      `}</style>
     </nav>
   )
 }

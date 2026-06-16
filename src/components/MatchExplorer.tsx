@@ -76,7 +76,7 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
   const awayFlag = flagUrl(match.awayTeamCode, 320)
 
   return (
-    <Link href={`/match/${match.id}`} style={{ textDecoration: "none" }}>
+    <Link href={`/match/${match.id}`} style={{ textDecoration: "none" }} data-match-id={match.id} data-match-status={match.status} data-predicted={hasPredicted ? "true" : "false"}>
       <div
         className="card"
         style={{

@@ -14,7 +14,44 @@ type UserRow = {
   accuracy: number
 }
 
-const medals = ["🥇", "🥈", "🥉"]
+const RANK_STYLES: Record<number, { ring: string; bg: string; emoji: string }> = {
+  1: { ring: "linear-gradient(135deg, #f5d36a, #d4a72c)", bg: "rgba(232,193,74,0.16)", emoji: "🥇" },
+  2: { ring: "linear-gradient(135deg, #e3e9ee, #b9c2cb)", bg: "rgba(180,190,200,0.16)", emoji: "🥈" },
+  3: { ring: "linear-gradient(135deg, #e8b27a, #b9743a)", bg: "rgba(200,130,70,0.16)", emoji: "🥉" },
+}
+
+function RankBadge({ rank }: { rank: number }) {
+  const top = RANK_STYLES[rank]
+  if (top) {
+    return (
+      <div
+        style={{
+          width: 38, height: 38, borderRadius: "50%",
+          background: top.ring,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.5)",
+          flexShrink: 0,
+        }}
+      >
+        <span style={{ fontSize: 18 }}>{top.emoji}</span>
+      </div>
+    )
+  }
+  return (
+    <div
+      style={{
+        width: 38, height: 38, borderRadius: "50%",
+        background: "rgba(255,255,255,0.5)",
+        border: "1px solid rgba(45,122,45,0.18)",
+        backdropFilter: "blur(6px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+      }}
+    >
+      <span className="display" style={{ fontSize: 14, fontWeight: 700, color: "var(--chalk-dim)" }}>{rank}</span>
+    </div>
+  )
+}
 
 function UserCard({ user, rank, isMe, isFriend, onRemove }: {
   user: UserRow
@@ -23,28 +60,22 @@ function UserCard({ user, rank, isMe, isFriend, onRemove }: {
   isFriend?: boolean
   onRemove?: () => void
 }) {
-  const isTop3 = rank <= 3
+  const top = RANK_STYLES[rank]
   return (
     <div
       className="card"
       style={{
-        padding: "14px 20px",
+        padding: "14px 18px",
         display: "flex",
         alignItems: "center",
-        gap: 16,
-        borderColor: isMe ? "var(--grass)" : isTop3 ? "var(--line-bright)" : undefined,
-        background: isMe ? "rgba(45,122,45,0.06)" : rank === 1 ? "rgba(232,193,74,0.05)" : undefined,
+        gap: 14,
+        borderColor: isMe ? "var(--grass)" : undefined,
+        background: isMe ? "rgba(45,122,45,0.08)" : top ? top.bg : undefined,
       }}
     >
-      <div style={{ minWidth: 36, textAlign: "center" }}>
-        {rank <= 3 ? (
-          <span style={{ fontSize: 22 }}>{medals[rank - 1]}</span>
-        ) : (
-          <span className="display" style={{ fontSize: 18, fontWeight: 700, color: "var(--chalk-faint)" }}>{rank}</span>
-        )}
-      </div>
+      <RankBadge rank={rank} />
 
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
           <Link
             href={`/profile/${user.anonUserId}`}
@@ -52,28 +83,89 @@ function UserCard({ user, rank, isMe, isFriend, onRemove }: {
           >
             {user.username ? `@${user.username}` : `${user.anonUserId.slice(0, 8)}...`}
           </Link>
-          {isMe && <span style={{ fontSize: 11, background: "rgba(45,122,45,0.12)", color: "var(--grass)", padding: "1px 6px", borderRadius: 4, fontWeight: 600 }}>You</span>}
+          {isMe && <span style={{ fontSize: 11, background: "rgba(45,122,45,0.15)", color: "var(--grass)", padding: "1px 6px", borderRadius: 4, fontWeight: 600 }}>You</span>}
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 3, flexWrap: "wrap" }}>
           <span style={{ fontSize: 12, color: "var(--chalk-faint)" }}>{user.totalPredictions} predicted</span>
-          {user.currentStreak > 0 && <span style={{ fontSize: 12, color: "var(--gold)" }}>🔥 {user.currentStreak} streak</span>}
+          {user.currentStreak > 0 && <span style={{ fontSize: 12, color: "var(--gold)" }}>🔥 {user.currentStreak}</span>}
         </div>
       </div>
 
-      <div style={{ textAlign: "right" }}>
-        <div className="display" style={{ fontSize: 26, fontWeight: 900, lineHeight: 1, color: isTop3 ? "var(--gold)" : "var(--chalk)" }}>
-          {user.totalScore}<span style={{ fontSize: 13, color: "var(--chalk-faint)", fontWeight: 400 }}> pts</span>
+      <div style={{ textAlign: "right", flexShrink: 0 }}>
+        <div className="display" style={{ fontSize: 24, fontWeight: 800, lineHeight: 1, color: top ? "var(--gold)" : "var(--chalk)" }}>
+          {user.totalScore}<span style={{ fontSize: 12, color: "var(--chalk-faint)", fontWeight: 400 }}> pts</span>
         </div>
-        <div style={{ fontSize: 12, color: "var(--chalk-faint)", marginTop: 2 }}>{user.accuracy}% accuracy</div>
+        <div style={{ fontSize: 11, color: "var(--chalk-faint)", marginTop: 2 }}>{user.accuracy}% acc</div>
       </div>
 
       {isFriend && onRemove && (
         <button
           onClick={onRemove}
           title="Remove friend"
-          style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--chalk-faint)", fontSize: 16, padding: "4px", lineHeight: 1 }}
+          style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--chalk-faint)", fontSize: 16, padding: "4px", lineHeight: 1, flexShrink: 0 }}
         >✕</button>
       )}
+    </div>
+  )
+}
+
+function Podium({ users, myId }: { users: UserRow[]; myId: string | null }) {
+  const [first, second, third] = users
+  if (!first) return null
+
+  const PodiumSpot = ({ user, place }: { user: UserRow; place: 1 | 2 | 3 }) => {
+    const style = RANK_STYLES[place]
+    const height = place === 1 ? 132 : place === 2 ? 108 : 92
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, order: place === 1 ? 2 : place === 2 ? 1 : 3 }}>
+        <div
+          style={{
+            width: 56, height: 56, borderRadius: "50%",
+            background: style.ring,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 26, marginBottom: 8,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.5)",
+          }}
+        >
+          {style.emoji}
+        </div>
+        <Link
+          href={`/profile/${user.anonUserId}`}
+          style={{ fontSize: 13, fontWeight: 700, color: "var(--chalk)", textDecoration: "none", textAlign: "center", maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        >
+          {user.username ? `@${user.username}` : `${user.anonUserId.slice(0, 6)}...`}
+          {user.anonUserId === myId && " (You)"}
+        </Link>
+        <div className="display" style={{ fontSize: 18, fontWeight: 800, color: "var(--gold)", marginTop: 2 }}>{user.totalScore}</div>
+        <div
+          style={{
+            width: "100%", height, marginTop: 10, borderRadius: "12px 12px 0 0",
+            background: `linear-gradient(180deg, rgba(255,255,255,0.5), ${place === 1 ? "rgba(232,193,74,0.25)" : place === 2 ? "rgba(180,190,200,0.25)" : "rgba(200,130,70,0.25)"})`,
+            border: "1px solid rgba(255,255,255,0.4)",
+            backdropFilter: "blur(8px)",
+            display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 8,
+          }}
+        >
+          <span className="display" style={{ fontSize: 22, fontWeight: 800, color: "rgba(255,255,255,0.7)" }}>{place}</span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      style={{
+        display: "flex", alignItems: "flex-end", gap: 12, marginBottom: 28,
+        padding: "24px 20px 0", borderRadius: 20,
+        background: "rgba(255,255,255,0.4)",
+        border: "1px solid rgba(45,122,45,0.15)",
+        backdropFilter: "blur(16px) saturate(160%)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 24px rgba(45,122,45,0.06)",
+      }}
+    >
+      {first && <PodiumSpot user={first} place={1} />}
+      {second && <PodiumSpot user={second} place={2} />}
+      {third && <PodiumSpot user={third} place={3} />}
     </div>
   )
 }
@@ -93,15 +185,9 @@ function RequestRow({ user, onAccept, onReject, onCancel }: {
         <div style={{ fontSize: 12, color: "var(--chalk-faint)" }}>{user.totalPredictions} predictions · {user.accuracy}% accuracy</div>
       </div>
       <div style={{ display: "flex", gap: 6 }}>
-        {onAccept && (
-          <button onClick={onAccept} className="btn-primary" style={{ padding: "6px 14px", fontSize: 12 }}>Accept</button>
-        )}
-        {onReject && (
-          <button onClick={onReject} className="btn-secondary" style={{ padding: "6px 14px", fontSize: 12 }}>Decline</button>
-        )}
-        {onCancel && (
-          <button onClick={onCancel} className="btn-secondary" style={{ padding: "6px 14px", fontSize: 12 }}>Cancel</button>
-        )}
+        {onAccept && <button onClick={onAccept} className="btn-primary" style={{ padding: "6px 14px", fontSize: 12 }}>Accept</button>}
+        {onReject && <button onClick={onReject} className="btn-secondary" style={{ padding: "6px 14px", fontSize: 12 }}>Decline</button>}
+        {onCancel && <button onClick={onCancel} className="btn-secondary" style={{ padding: "6px 14px", fontSize: 12 }}>Cancel</button>}
       </div>
     </div>
   )
@@ -180,12 +266,14 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
   }
 
   const myRankGlobal = myId ? users.findIndex((u) => u.anonUserId === myId) + 1 : null
+  const top3 = users.slice(0, 3)
+  const rest = users.slice(3)
 
   return (
     <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 20px 80px" }}>
       <div style={{ marginBottom: 28 }}>
-        <h1 className="display" style={{ fontSize: 56, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.02em", lineHeight: 0.95 }}>
-          Leader<span style={{ color: "var(--gold)" }}>board</span>
+        <h1 className="display" style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1 }}>
+          Leaderboard
         </h1>
         {myRankGlobal && myRankGlobal > 0 && (
           <div style={{ marginTop: 8 }}>
@@ -194,19 +282,25 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
         )}
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+      {/* Glass tab pills */}
+      <div
+        style={{
+          display: "inline-flex", gap: 3, marginBottom: 24, padding: 3, borderRadius: 999,
+          background: "rgba(255,255,255,0.5)", border: "1px solid rgba(45,122,45,0.15)",
+          backdropFilter: "blur(10px)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
+        }}
+      >
         {(["global", "friends"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             style={{
-              padding: "8px 20px", borderRadius: 8, border: "1px solid",
-              borderColor: tab === t ? "var(--grass)" : "var(--line-bright)",
-              background: tab === t ? "rgba(45,122,45,0.1)" : "transparent",
-              color: tab === t ? "var(--grass)" : "var(--chalk-dim)",
-              fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700,
-              textTransform: "uppercase", letterSpacing: "0.06em", cursor: "pointer",
-              position: "relative",
+              padding: "8px 20px", borderRadius: 999, border: "none",
+              background: tab === t ? "var(--grass)" : "transparent",
+              color: tab === t ? "#fff" : "var(--chalk-dim)",
+              fontFamily: "var(--font-display)", fontSize: 13, fontWeight: 700,
+              textTransform: "uppercase", letterSpacing: "0.05em", cursor: "pointer",
+              position: "relative", transition: "background 0.25s ease, color 0.2s ease",
             }}
           >
             {t === "global" ? "🌍 Global" : "👥 Friends"}
@@ -223,15 +317,18 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
         users.length === 0 ? (
           <div className="card" style={{ padding: "60px 20px", textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🏆</div>
-            <p className="display" style={{ fontSize: 20, fontWeight: 700, textTransform: "uppercase", color: "var(--chalk-dim)" }}>No scores yet</p>
+            <p className="display" style={{ fontSize: 20, fontWeight: 700, color: "var(--chalk-dim)" }}>No scores yet</p>
             <Link href="/" className="btn-primary" style={{ marginTop: 20, display: "inline-flex" }}>Start predicting →</Link>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {users.map((user, i) => (
-              <UserCard key={user.anonUserId} user={user} rank={i + 1} isMe={user.anonUserId === myId} isFriend={friendIds.has(user.anonUserId)} />
-            ))}
-          </div>
+          <>
+            <Podium users={top3} myId={myId} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {rest.map((user, i) => (
+                <UserCard key={user.anonUserId} user={user} rank={i + 4} isMe={user.anonUserId === myId} isFriend={friendIds.has(user.anonUserId)} />
+              ))}
+            </div>
+          </>
         )
       )}
 
@@ -268,12 +365,7 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {incoming.map((u) => (
-                  <RequestRow
-                    key={u.anonUserId}
-                    user={u}
-                    onAccept={() => respondToRequest(u.anonUserId, "accept")}
-                    onReject={() => respondToRequest(u.anonUserId, "reject")}
-                  />
+                  <RequestRow key={u.anonUserId} user={u} onAccept={() => respondToRequest(u.anonUserId, "accept")} onReject={() => respondToRequest(u.anonUserId, "reject")} />
                 ))}
               </div>
             </section>
@@ -298,8 +390,8 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
           {friendRows.length === 0 ? (
             <div className="card" style={{ padding: "40px 20px", textAlign: "center" }}>
               <div style={{ fontSize: 36, marginBottom: 10 }}>👥</div>
-              <p className="display" style={{ fontSize: 18, fontWeight: 700, textTransform: "uppercase", color: "var(--chalk-dim)" }}>No friends yet</p>
-              <p style={{ color: "var(--chalk-faint)", fontSize: 14, marginTop: 8 }}>Send a request by username above. They'll need to accept before you both show up on each other's friends board.</p>
+              <p className="display" style={{ fontSize: 18, fontWeight: 700, color: "var(--chalk-dim)" }}>No friends yet</p>
+              <p style={{ color: "var(--chalk-faint)", fontSize: 14, marginTop: 8 }}>Send a request by username above. They&apos;ll need to accept before you both show up on each other&apos;s friends board.</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>

@@ -5,11 +5,11 @@ import Ferrofluid from "@/components/ui/Ferrofluid"
 import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
-  title: "Vibe Checker — 2026 World Cup",
-  description: "Predict every World Cup match. Track your streak. See how the crowd called it.",
+  title: "UKNOWBALL? — World Cup 2026 Predictions",
+  description: "Predict every World Cup match, build your streak, and see how your calls compare to everyone else.",
   openGraph: {
-    title: "Vibe Checker — 2026 World Cup",
-    description: "Predict every World Cup match. Track your streak.",
+    title: "UKNOWBALL? — World Cup 2026 Predictions",
+    description: "Predict every World Cup match. Build your streak. Prove you know ball.",
     type: "website",
   },
 }

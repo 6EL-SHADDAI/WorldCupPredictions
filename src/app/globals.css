@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* check tailwind*/
+
 :root {
   /* Palette — white pitch theme */
   --pitch: #ffffff;            /* page background — clean white */
@@ -19,7 +19,7 @@
   --chalk-faint: #a3b3a0;      /* muted text */
 
   /* Typography */
-  --font-display: 'Barlow Condensed', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
 }
 
