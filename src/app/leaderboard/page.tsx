@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Suspense } from "react"
 import { db } from "@/db"
 import { streaks } from "@/db/schema"
 import { desc } from "drizzle-orm"
@@ -20,5 +20,9 @@ export default async function LeaderboardPage() {
     accuracy: u.totalMaxScore > 0 ? Math.round((u.totalScore / u.totalMaxScore) * 100) : 0,
   }))
 
-  return <LeaderboardClient users={users} />
+  return (
+    <Suspense fallback={null}>
+      <LeaderboardClient users={users} />
+    </Suspense>
+  )
 }
