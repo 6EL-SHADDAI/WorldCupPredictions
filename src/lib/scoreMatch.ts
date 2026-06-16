@@ -3,6 +3,7 @@ import { matches, predictions, questions, streaks, crowdTallies } from "@/db/sch
 import { eq, and } from "drizzle-orm"
 import { deriveCorrectAnswers, scorePrediction, updateStreakValues } from "./scoring"
 import { updateLeaderboard, getAllTallies } from "./redis"
+import { checkAndAwardBadges } from "./badges"
 import type { PredictionAnswers } from "@/db/schema"
 
 export type ScoreMatchResult =
@@ -131,6 +132,10 @@ export async function scoreMatch(matchId: string): Promise<ScoreMatchResult> {
 
     await updateLeaderboard(prediction.anonUserId, newTotalScore).catch((e) =>
       console.error("[scoreMatch] leaderboard update failed", e)
+    )
+
+    await checkAndAwardBadges(prediction.anonUserId).catch((e) =>
+      console.error("[scoreMatch] badge check failed", e)
     )
 
     scored++
