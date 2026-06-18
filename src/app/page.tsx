@@ -3,6 +3,7 @@ import { matches } from "@/db/schema"
 import { asc } from "drizzle-orm"
 import MatchExplorer from "@/components/MatchExplorer"
 import MatchDayBanner from "@/components/MatchDayBanner"
+import HeroStatTile from "@/components/HeroStatTile"
 
 export const revalidate = 60
 
@@ -55,7 +56,7 @@ export default async function HomePage() {
             textTransform: "uppercase", letterSpacing: "0.08em",
           }}
         >
-           World Cup 2026
+          ⚽ World Cup 2026
         </div>
 
         <h1
@@ -84,21 +85,7 @@ export default async function HomePage() {
             { value: finished.length, label: "Played", color: "var(--gold)" },
             { value: live.length || undefined, label: "Live Now", color: "var(--red-card)" },
           ].filter((s) => s.value !== undefined && s.value !== 0).map(({ value, label, color }) => (
-            <div
-              key={label}
-              style={{
-                minWidth: 90,
-                padding: "14px 18px",
-                borderRadius: 16,
-                background: "rgba(255,255,255,0.55)",
-                border: "1px solid rgba(45,122,45,0.15)",
-                backdropFilter: "blur(8px)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
-              }}
-            >
-              <div className="display" style={{ fontSize: 32, fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
-              <div style={{ fontSize: 11, color: "var(--chalk-faint)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginTop: 4 }}>{label}</div>
-            </div>
+            <HeroStatTile key={label} value={value as number} label={label} color={color} />
           ))}
         </div>
       </div>

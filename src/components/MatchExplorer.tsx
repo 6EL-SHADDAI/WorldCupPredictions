@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
 import type { Match } from "@/db/schema"
 import { flagUrl } from "@/lib/flags"
+import LazyGlass from "@/components/ui/LazyGlass"
 
 function useNow(intervalMs = 10000) {
   const [now, setNow] = useState(() => Date.now())
@@ -76,18 +77,10 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
   const awayFlag = flagUrl(match.awayTeamCode, 320)
 
   return (
-    <Link href={`/match/${match.id}`} style={{ textDecoration: "none" }} data-match-id={match.id} data-match-status={match.status} data-predicted={hasPredicted ? "true" : "false"}>
-      <div
-        className="card"
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          cursor: "pointer",
-          minHeight: 150,
-        }}
-      >
-        {/* Split flag backgrounds */}
-        <div style={{ position: "absolute", inset: 0, display: "flex" }}>
+    <Link href={`/match/${match.id}`} style={{ textDecoration: "none", display: "block" }} data-match-id={match.id} data-match-status={match.status} data-predicted={hasPredicted ? "true" : "false"}>
+      <div style={{ position: "relative", overflow: "hidden", borderRadius: 14, cursor: "pointer", minHeight: 150 }}>
+        {/* Split flag backgrounds — sit behind the glass so it refracts them */}
+        <div style={{ position: "absolute", inset: 0, display: "flex", zIndex: 0 }}>
           <div
             style={{
               flex: 1,
@@ -111,6 +104,8 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.78) 100%)" }} />
           </div>
         </div>
+
+        <LazyGlass tint="rgba(255,255,255,0.04)" cornerRadius={14} style={{ position: "relative", zIndex: 1 }}>
 
         {/* Content */}
         <div
@@ -201,10 +196,11 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
                 boxShadow: "0 2px 12px rgba(45,122,45,0.15)",
               }}
             >
-               Predict This Match
+              ⚽ Predict This Match
             </div>
           )}
         </div>
+        </LazyGlass>
       </div>
     </Link>
   )
@@ -318,7 +314,7 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
 
           {allMatches.length === 0 && (
             <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--chalk-faint)" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}></div>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>⚽</div>
               <p className="display" style={{ fontSize: 20, fontWeight: 700, textTransform: "uppercase" }}>No matches yet</p>
             </div>
           )}

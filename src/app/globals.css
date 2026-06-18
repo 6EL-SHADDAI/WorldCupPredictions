@@ -16,7 +16,7 @@
   --red-card: #d92b2b;         /* danger / wrong */
   --chalk: #16201a;            /* primary text — near-black green-grey */
   --chalk-dim: #5a6b58;        /* secondary text */
-  --chalk-faint: #a3b3a0;      /* muted text m */
+  --chalk-faint: #a3b3a0;      /* muted text */
 
   /* Typography */
   --font-display: 'Space Grotesk', sans-serif;
@@ -69,16 +69,17 @@ html {
 
 /* Card base — glossy green glass */
 .card {
-  background: rgba(45, 122, 45, 0.08);
-  border: 1px solid rgba(45, 122, 45, 0.18);
+  background: rgba(45, 122, 45, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 14px;
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  box-shadow: 0 4px 24px rgba(45, 122, 45, 0.08), inset 0 1px 0 rgba(255,255,255,0.4);
-  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 4px 28px rgba(45, 122, 45, 0.10), inset 0 1px 0 rgba(255,255,255,0.55), inset 0 0 0 1px rgba(45,122,45,0.06);
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.10) 100%);
+  transition: border-color 0.15s, background 0.15s, transform 0.1s, box-shadow 0.2s;
 }
 .card:hover {
-  border-color: rgba(45, 122, 45, 0.35);
+  border-color: rgba(255, 255, 255, 0.65);
   background: rgba(45, 122, 45, 0.13);
   transform: translateY(-1px);
 }
@@ -92,8 +93,11 @@ html {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: 3px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px) saturate(160%);
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.4);
 }
 .badge-live { background: rgba(217, 43, 43, 0.1); color: var(--red-card); }
 .badge-upcoming { background: rgba(45, 122, 45, 0.1); color: var(--grass); }
@@ -106,7 +110,10 @@ html {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: var(--grass);
+  background: linear-gradient(135deg, rgba(58,170,58,0.55), rgba(45,122,45,0.75));
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.4);
   color: #ffffff;
   font-family: var(--font-display);
   font-size: 16px;
@@ -114,22 +121,27 @@ html {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 12px 28px;
-  border-radius: 6px;
-  border: none;
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 4px 20px rgba(45,122,45,0.28), inset 0 1px 0 rgba(255,255,255,0.5);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
   text-decoration: none;
 }
-.btn-primary:hover { background: var(--grass-bright); transform: translateY(-1px); }
-.btn-primary:active { transform: translateY(0); }
-.btn-primary:disabled { background: var(--chalk-faint); cursor: not-allowed; transform: none; }
+.btn-primary:hover {
+  box-shadow: 0 6px 28px rgba(45,122,45,0.38), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.btn-primary:hover { transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0) scale(0.98); }
+.btn-primary:disabled { background: rgba(150,150,150,0.3); box-shadow: none; cursor: not-allowed; transform: none; }
 
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: transparent;
+  background: rgba(255,255,255,0.35);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
   color: var(--chalk-dim);
   font-family: var(--font-display);
   font-size: 15px;
@@ -137,10 +149,11 @@ html {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 10px 20px;
-  border-radius: 6px;
-  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.5);
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 12px rgba(45,122,45,0.06);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
   text-decoration: none;
 }
 .btn-secondary:hover { border-color: var(--grass); color: var(--grass); }

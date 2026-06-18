@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import LiquidGlass from "@/components/ui/liquid-glass/LiquidGlass"
+import LazyGlass from "@/components/ui/LazyGlass"
 
 type UserRow = {
   anonUserId: string
@@ -62,17 +64,18 @@ function UserCard({ user, rank, isMe, isFriend, onRemove }: {
 }) {
   const top = RANK_STYLES[rank]
   return (
-    <div
-      className="card"
-      style={{
-        padding: "14px 18px",
-        display: "flex",
-        alignItems: "center",
-        gap: 14,
-        borderColor: isMe ? "var(--grass)" : undefined,
-        background: isMe ? "rgba(45,122,45,0.08)" : top ? top.bg : undefined,
-      }}
+    <LazyGlass
+      tint={isMe ? "rgba(45,122,45,0.10)" : top ? top.bg : "rgba(255,255,255,0.03)"}
+      cornerRadius={14}
     >
+      <div
+        style={{
+          padding: "14px 18px",
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+        }}
+      >
       <RankBadge rank={rank} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -105,7 +108,8 @@ function UserCard({ user, rank, isMe, isFriend, onRemove }: {
           style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--chalk-faint)", fontSize: 16, padding: "4px", lineHeight: 1, flexShrink: 0 }}
         >✕</button>
       )}
-    </div>
+      </div>
+    </LazyGlass>
   )
 }
 
@@ -137,36 +141,47 @@ function Podium({ users, myId }: { users: UserRow[]; myId: string | null }) {
           {user.anonUserId === myId && " (You)"}
         </Link>
         <div className="display" style={{ fontSize: 18, fontWeight: 800, color: "var(--gold)", marginTop: 2 }}>{user.totalScore}</div>
-        <div
-          style={{
-            width: "100%", height, marginTop: 10, borderRadius: "12px 12px 0 0",
-            background: `linear-gradient(180deg, rgba(255,255,255,0.5), ${place === 1 ? "rgba(232,193,74,0.25)" : place === 2 ? "rgba(180,190,200,0.25)" : "rgba(200,130,70,0.25)"})`,
-            border: "1px solid rgba(255,255,255,0.4)",
-            backdropFilter: "blur(8px)",
-            display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 8,
-          }}
+        <LiquidGlass
+          layout="inline"
+          mode="standard"
+          displacementScale={32}
+          blurAmount={0.07}
+          saturation={170}
+          aberrationIntensity={1.4}
+          elasticity={0}
+          cornerRadius={12}
+          padding="8px 0 0"
+          tint={place === 1 ? "rgba(232,193,74,0.18)" : place === 2 ? "rgba(180,190,200,0.18)" : "rgba(200,130,70,0.18)"}
+          style={{ width: "100%", marginTop: 10 }}
         >
-          <span className="display" style={{ fontSize: 22, fontWeight: 800, color: "rgba(255,255,255,0.7)" }}>{place}</span>
-        </div>
+          <div style={{ height, display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
+            <span className="display" style={{ fontSize: 22, fontWeight: 800, color: "rgba(255,255,255,0.7)" }}>{place}</span>
+          </div>
+        </LiquidGlass>
       </div>
     )
   }
 
   return (
-    <div
-      style={{
-        display: "flex", alignItems: "flex-end", gap: 12, marginBottom: 28,
-        padding: "24px 20px 0", borderRadius: 20,
-        background: "rgba(255,255,255,0.4)",
-        border: "1px solid rgba(45,122,45,0.15)",
-        backdropFilter: "blur(16px) saturate(160%)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 24px rgba(45,122,45,0.06)",
-      }}
+    <LiquidGlass
+      layout="inline"
+      mode="standard"
+      displacementScale={55}
+      blurAmount={0.1}
+      saturation={170}
+      aberrationIntensity={1.6}
+      elasticity={0}
+      cornerRadius={20}
+      padding="24px 20px 0"
+      tint="rgba(45,122,45,0.04)"
+      style={{ width: "100%", marginBottom: 28 }}
     >
-      {first && <PodiumSpot user={first} place={1} />}
-      {second && <PodiumSpot user={second} place={2} />}
-      {third && <PodiumSpot user={third} place={3} />}
-    </div>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
+        {first && <PodiumSpot user={first} place={1} />}
+        {second && <PodiumSpot user={second} place={2} />}
+        {third && <PodiumSpot user={third} place={3} />}
+      </div>
+    </LiquidGlass>
   )
 }
 
@@ -177,7 +192,21 @@ function RequestRow({ user, onAccept, onReject, onCancel }: {
   onCancel?: () => void
 }) {
   return (
-    <div className="card" style={{ padding: "12px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+    <LiquidGlass
+      layout="inline"
+      mode="standard"
+      displacementScale={32}
+      blurAmount={0.07}
+      saturation={155}
+      aberrationIntensity={1.2}
+      elasticity={0.04}
+      cornerRadius={14}
+      padding="12px 18px"
+      tint="rgba(45,122,45,0.04)"
+      contentColor="var(--chalk)"
+      style={{ width: "100%" }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
       <div>
         <div style={{ fontSize: 14, fontWeight: 700, color: "var(--chalk)" }}>
           {user.username ? `@${user.username}` : `${user.anonUserId.slice(0, 8)}...`}
@@ -189,7 +218,8 @@ function RequestRow({ user, onAccept, onReject, onCancel }: {
         {onReject && <button onClick={onReject} className="btn-secondary" style={{ padding: "6px 14px", fontSize: 12 }}>Decline</button>}
         {onCancel && <button onClick={onCancel} className="btn-secondary" style={{ padding: "6px 14px", fontSize: 12 }}>Cancel</button>}
       </div>
-    </div>
+      </div>
+    </LiquidGlass>
   )
 }
 
@@ -283,13 +313,20 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
       </div>
 
       {/* Glass tab pills */}
-      <div
-        style={{
-          display: "inline-flex", gap: 3, marginBottom: 24, padding: 3, borderRadius: 999,
-          background: "rgba(255,255,255,0.5)", border: "1px solid rgba(45,122,45,0.15)",
-          backdropFilter: "blur(10px)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
-        }}
+      <LiquidGlass
+        layout="inline"
+        mode="standard"
+        displacementScale={36}
+        blurAmount={0.07}
+        saturation={160}
+        aberrationIntensity={1.5}
+        elasticity={0}
+        cornerRadius={999}
+        padding="3px"
+        tint="rgba(45,122,45,0.03)"
+        style={{ marginBottom: 24 }}
       >
+        <div style={{ display: "inline-flex", gap: 3 }}>
         {(["global", "friends"] as const).map((t) => (
           <button
             key={t}
@@ -311,7 +348,8 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
             )}
           </button>
         ))}
-      </div>
+        </div>
+      </LiquidGlass>
 
       {tab === "global" && (
         users.length === 0 ? (

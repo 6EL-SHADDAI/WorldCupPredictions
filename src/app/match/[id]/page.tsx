@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { flagUrl } from "@/lib/flags"
+import LiquidGlass from "@/components/ui/liquid-glass/LiquidGlass"
+import LazyGlass from "@/components/ui/LazyGlass"
 
 type Option = { value: string; label: string }
 type Question = { id: string; questionKey: string; questionText: string; options: Option[]; correctAnswer?: string; sortOrder: number }
@@ -42,7 +44,19 @@ function FlagHeader({ match }: { match: MatchData }) {
   const isLive = match.status === "live"
 
   return (
-    <div className="card" style={{ position: "relative", overflow: "hidden", marginBottom: 28 }}>
+    <LiquidGlass
+      layout="inline"
+      mode="standard"
+      displacementScale={60}
+      blurAmount={0.1}
+      saturation={170}
+      aberrationIntensity={1.8}
+      elasticity={0}
+      cornerRadius={14}
+      padding="0px"
+      tint="rgba(255,255,255,0.02)"
+      style={{ width: "100%", marginBottom: 28, position: "relative", overflow: "hidden" }}
+    >
       <div style={{ position: "absolute", inset: 0, display: "flex" }}>
         <div style={{ flex: 1, backgroundImage: homeFlag ? `url(${homeFlag})` : undefined, backgroundSize: "cover", backgroundPosition: "center", position: "relative" }}>
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.87) 100%)" }} />
@@ -81,7 +95,7 @@ function FlagHeader({ match }: { match: MatchData }) {
           </div>
         </div>
       </div>
-    </div>
+    </LiquidGlass>
   )
 }
 
@@ -186,13 +200,21 @@ export default function MatchPage() {
       {alreadyPredicted && myPrediction && (
         <>
           {submitted && (
-            <div className="card fade-in" style={{ padding: "20px 24px", marginBottom: 20, borderColor: "var(--grass)", textAlign: "center" }}>
+            <LiquidGlass
+              layout="inline" mode="standard" displacementScale={36} blurAmount={0.08}
+              saturation={170} aberrationIntensity={1.5} elasticity={0} cornerRadius={14}
+              padding="20px 24px" tint="rgba(45,122,45,0.14)" style={{ width: "100%", marginBottom: 20, textAlign: "center" }}
+            >
               <div style={{ fontSize: 32, marginBottom: 4 }}>✅</div>
               <div className="display" style={{ fontSize: 18, fontWeight: 800, textTransform: "uppercase", color: "var(--grass)" }}>Prediction locked in!</div>
-            </div>
+            </LiquidGlass>
           )}
 
-          <div className="card" style={{ padding: "24px", marginBottom: 20 }}>
+          <LiquidGlass
+            layout="inline" mode="standard" displacementScale={40} blurAmount={0.08}
+            saturation={155} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
+            padding="24px" tint="rgba(45,122,45,0.04)" style={{ width: "100%", marginBottom: 20 }}
+          >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <span className="display" style={{ fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", color: "var(--chalk-dim)" }}>
                 Your Prediction
@@ -233,10 +255,14 @@ export default function MatchPage() {
                 </span>
               </div>
             </div>
-          </div>
+          </LiquidGlass>
 
           {crowd && crowd.percentages.winner && (
-            <div className="card" style={{ padding: "24px", marginBottom: 20 }}>
+            <LiquidGlass
+              layout="inline" mode="standard" displacementScale={40} blurAmount={0.08}
+              saturation={155} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
+              padding="24px" tint="rgba(45,122,45,0.04)" style={{ width: "100%", marginBottom: 20 }}
+            >
               <div className="display" style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--chalk-faint)", marginBottom: 14 }}>
                 🧠 How the crowd voted
               </div>
@@ -254,7 +280,7 @@ export default function MatchPage() {
                   isCorrect={isFinished && questions.find((q) => q.questionKey === "winner")?.correctAnswer === value}
                 />
               ))}
-            </div>
+            </LiquidGlass>
           )}
 
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
@@ -274,15 +300,26 @@ export default function MatchPage() {
           )}
 
           {isLocked && !isFinished && (
-            <div className="card" style={{ padding: 20, marginBottom: 24, borderColor: "var(--red-card)", textAlign: "center" }}>
+            <LiquidGlass
+              layout="inline" mode="standard" displacementScale={36} blurAmount={0.08}
+              saturation={150} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
+              padding="20px" tint="rgba(217,43,43,0.08)" style={{ width: "100%", marginBottom: 24, textAlign: "center" }}
+            >
               <p style={{ color: "var(--chalk-dim)", fontSize: 14 }}>Predictions are closed — this match has kicked off.</p>
-            </div>
+            </LiquidGlass>
           )}
 
           {!isFinished && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {mainQuestions.map((q, i) => (
-                <div key={q.id} className="card fade-in" style={{ padding: "20px 24px", animationDelay: `${i * 0.05}s` }}>
+                <LiquidGlass
+                  key={q.id}
+                  layout="inline" mode="standard" displacementScale={36} blurAmount={0.07}
+                  saturation={150} aberrationIntensity={1.2} elasticity={0.04} cornerRadius={14}
+                  padding="20px 24px" tint="rgba(255,255,255,0.03)"
+                  style={{ width: "100%", animationDelay: `${i * 0.05}s` }}
+                  className="fade-in"
+                >
                   <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
                     <span className="display" style={{ fontSize: 13, fontWeight: 700, color: "var(--grass)", letterSpacing: "0.06em" }}>Q{i + 1}</span>
                     <span style={{ fontSize: 15, fontWeight: 500, color: "var(--chalk)" }}>{q.questionText}</span>
@@ -309,11 +346,15 @@ export default function MatchPage() {
                       )
                     })}
                   </div>
-                </div>
+                </LiquidGlass>
               ))}
 
               {!isLocked && mainQuestions.length > 0 && (
-                <div className="card" style={{ padding: "20px 24px" }}>
+                <LiquidGlass
+                  layout="inline" mode="standard" displacementScale={36} blurAmount={0.07}
+                  saturation={150} aberrationIntensity={1.2} elasticity={0} cornerRadius={14}
+                  padding="20px 24px" tint="rgba(232,193,74,0.06)" style={{ width: "100%" }}
+                >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
                     <span style={{ fontSize: 15, fontWeight: 500 }}>How confident are you?</span>
                     <span className="display" style={{ fontSize: 22, fontWeight: 800, color: "var(--gold)" }}>
@@ -325,7 +366,7 @@ export default function MatchPage() {
                     <span style={{ fontSize: 11, color: "var(--chalk-faint)" }}>Low</span>
                     <span style={{ fontSize: 11, color: "var(--chalk-faint)" }}>High (×2 pts if right, ×0 if wrong)</span>
                   </div>
-                </div>
+                </LiquidGlass>
               )}
 
               {!isLocked && (
@@ -337,7 +378,7 @@ export default function MatchPage() {
                     disabled={!allAnswered || submitting}
                     onClick={handleSubmit}
                   >
-                    {submitting ? "Locking in..." : !allAnswered ? `Answer all ${mainQuestions.length} questions` : "Lock In My Prediction "}
+                    {submitting ? "Locking in..." : !allAnswered ? `Answer all ${mainQuestions.length} questions` : "Lock In My Prediction ⚽"}
                   </button>
                 </div>
               )}

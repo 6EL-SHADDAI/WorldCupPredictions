@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
+import LiquidGlass from "./liquid-glass/LiquidGlass"
 
 const links = [
   { href: "/", label: "Matches" },
@@ -103,27 +104,35 @@ export default function Nav() {
         </Link>
 
         {/* Desktop glass pill nav + My Stats together */}
-        <div
+        <LiquidGlass
           className="glass-pill-track"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 3,
-            padding: 3,
-            borderRadius: 999,
-            background: "rgba(255,255,255,0.5)",
-            border: "1px solid rgba(45,122,45,0.15)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 12px rgba(45,122,45,0.06)",
-          }}
+          layout="inline"
+          mode="standard"
+          displacementScale={42}
+          blurAmount={0.08}
+          saturation={170}
+          aberrationIntensity={1.8}
+          elasticity={0}
+          cornerRadius={999}
+          padding="3px"
+          tint="rgba(45,122,45,0.04)"
+          contentColor="var(--chalk)"
         >
-          {links.map((link) => (
-            <NavPill key={link.href} href={link.href} label={link.label} active={pathname === link.href} />
-          ))}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+            }}
+          >
+            {links.map((link) => (
+              <NavPill key={link.href} href={link.href} label={link.label} active={pathname === link.href} />
+            ))}
           {anonId && (
             <NavPill href={`/profile/${anonId}`} label="My Stats" active={pathname === `/profile/${anonId}`} />
           )}
-        </div>
+          </div>
+        </LiquidGlass>
 
         {/* User corner */}
         {anonId ? (
