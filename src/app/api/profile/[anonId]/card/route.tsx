@@ -112,7 +112,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ anon
                 display: "flex",
               }}
             >
-              ⚽
+              
             </div>
           </div>
 

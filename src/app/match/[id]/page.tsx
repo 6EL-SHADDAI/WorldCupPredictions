@@ -337,7 +337,7 @@ export default function MatchPage() {
                     disabled={!allAnswered || submitting}
                     onClick={handleSubmit}
                   >
-                    {submitting ? "Locking in..." : !allAnswered ? `Answer all ${mainQuestions.length} questions` : "Lock In My Prediction ⚽"}
+                    {submitting ? "Locking in..." : !allAnswered ? `Answer all ${mainQuestions.length} questions` : "Lock In My Prediction "}
                   </button>
                 </div>
               )}

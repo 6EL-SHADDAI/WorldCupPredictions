@@ -55,7 +55,7 @@ export default async function HomePage() {
             textTransform: "uppercase", letterSpacing: "0.08em",
           }}
         >
-          ⚽ World Cup 2026
+           World Cup 2026
         </div>
 
         <h1

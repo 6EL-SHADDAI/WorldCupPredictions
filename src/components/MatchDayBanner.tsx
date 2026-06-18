@@ -65,7 +65,7 @@ export default function MatchDayBanner({ count, live }: { count: number; live: n
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <span style={{ fontSize: 28 }}>{live > 0 ? "🔴" : "⚽"}</span>
+        <span style={{ fontSize: 28 }}>{live > 0 ? "🔴" : ""}</span>
         <div>
           <div className="display" style={{ fontSize: 16, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)" }}>
             {live > 0 ? `${live} match${live > 1 ? "es" : ""} live right now!` : `${count} match${count > 1 ? "es" : ""} today`}

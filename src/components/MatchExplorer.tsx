@@ -201,7 +201,7 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
                 boxShadow: "0 2px 12px rgba(45,122,45,0.15)",
               }}
             >
-              ⚽ Predict This Match
+               Predict This Match
             </div>
           )}
         </div>
@@ -318,7 +318,7 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
 
           {allMatches.length === 0 && (
             <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--chalk-faint)" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>⚽</div>
+              <div style={{ fontSize: 48, marginBottom: 16 }}></div>
               <p className="display" style={{ fontSize: 20, fontWeight: 700, textTransform: "uppercase" }}>No matches yet</p>
             </div>
           )}
