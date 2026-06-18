@@ -3,7 +3,6 @@ import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
 import type { Match } from "@/db/schema"
 import { flagUrl } from "@/lib/flags"
-import LazyGlass from "@/components/ui/LazyGlass"
 
 function useNow(intervalMs = 10000) {
   const [now, setNow] = useState(() => Date.now())
@@ -77,61 +76,40 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
   const awayFlag = flagUrl(match.awayTeamCode, 320)
 
   return (
-    <Link href={`/match/${match.id}`} style={{ textDecoration: "none", display: "block" }} data-match-id={match.id} data-match-status={match.status} data-predicted={hasPredicted ? "true" : "false"}>
-      <div style={{ position: "relative", overflow: "hidden", borderRadius: 14, cursor: "pointer", minHeight: 150 }}>
-        {/* Split flag backgrounds — sit behind the glass so it refracts them */}
-        <div style={{ position: "absolute", inset: 0, display: "flex", zIndex: 0 }}>
+    <Link
+      href={`/match/${match.id}`}
+      style={{ textDecoration: "none", display: "block" }}
+      data-match-id={match.id}
+      data-match-status={match.status}
+      data-predicted={hasPredicted ? "true" : "false"}
+    >
+      <div className="match-card">
+        {/* Split flag backgrounds */}
+        <div className="match-card-flags">
           <div
-            style={{
-              flex: 1,
-              backgroundImage: homeFlag ? `url(${homeFlag})` : undefined,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              position: "relative",
-            }}
-          >
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.88) 100%)" }} />
-          </div>
+            className="match-card-flag-half"
+            style={{ backgroundImage: homeFlag ? `url(${homeFlag})` : undefined }}
+          />
           <div
-            style={{
-              flex: 1,
-              backgroundImage: awayFlag ? `url(${awayFlag})` : undefined,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              position: "relative",
-            }}
-          >
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.78) 100%)" }} />
-          </div>
+            className="match-card-flag-half"
+            style={{ backgroundImage: awayFlag ? `url(${awayFlag})` : undefined }}
+          />
         </div>
 
-        <LazyGlass tint="rgba(255,255,255,0.04)" cornerRadius={14} style={{ position: "relative", zIndex: 1 }}>
-
         {/* Content */}
-        <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            padding: "18px 20px 14px",
-            display: "grid",
-            gridTemplateColumns: "1fr auto 1fr",
-            alignItems: "center",
-            gap: 16,
-            backdropFilter: "blur(2px)",
-          }}
-        >
+        <div className="match-card-content">
           <div style={{ textAlign: "right" }}>
-            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>
+            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)" }}>
               {match.homeTeam}
             </div>
-            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em" }}>
+            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 8px rgba(255,255,255,0.95)" }}>
               {match.homeTeamCode}
             </div>
           </div>
 
           <div style={{ textAlign: "center", minWidth: 100 }}>
             {isFinished ? (
-              <div className="display" style={{ fontSize: 30, fontWeight: 900, letterSpacing: "0.06em", color: "var(--chalk)", lineHeight: 1, textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>
+              <div className="display" style={{ fontSize: 30, fontWeight: 900, letterSpacing: "0.06em", color: "var(--chalk)", lineHeight: 1, textShadow: "0 1px 10px rgba(255,255,255,0.95)" }}>
                 {match.homeScore} <span style={{ color: "var(--chalk-faint)" }}>–</span> {match.awayScore}
               </div>
             ) : isLive ? (
@@ -152,55 +130,27 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
           </div>
 
           <div style={{ textAlign: "left" }}>
-            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>
+            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)" }}>
               {match.awayTeam}
             </div>
-            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em" }}>
+            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 8px rgba(255,255,255,0.95)" }}>
               {match.awayTeamCode}
             </div>
           </div>
         </div>
 
-        {/* Glass action button */}
-        <div style={{ position: "relative", zIndex: 1, padding: "0 20px 16px", display: "flex", justifyContent: "center" }}>
+        {/* Action pill */}
+        <div className="match-card-action">
           {isFinished ? (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.55)", backdropFilter: "blur(10px)",
-                border: "1px solid rgba(45,122,45,0.25)", borderRadius: 999,
-                padding: "7px 22px", fontSize: 12, fontWeight: 700,
-                color: "var(--grass)", textTransform: "uppercase", letterSpacing: "0.06em",
-              }}
-            >
+            <div className="match-pill match-pill-neutral">
               {hasPredicted ? "📊 View Your Result" : "📊 View Results"}
             </div>
           ) : hasPredicted ? (
-            <div
-              style={{
-                background: "rgba(45,122,45,0.18)", backdropFilter: "blur(10px)",
-                border: "1px solid rgba(45,122,45,0.4)", borderRadius: 999,
-                padding: "7px 22px", fontSize: 12, fontWeight: 700,
-                color: "var(--grass-bright)", textTransform: "uppercase", letterSpacing: "0.06em",
-                display: "flex", alignItems: "center", gap: 6,
-              }}
-            >
-              ✓ Prediction Locked In
-            </div>
+            <div className="match-pill match-pill-locked">✓ Prediction Locked In</div>
           ) : (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.6)", backdropFilter: "blur(10px)",
-                border: "1px solid rgba(45,122,45,0.35)", borderRadius: 999,
-                padding: "8px 26px", fontSize: 13, fontWeight: 800,
-                color: "var(--grass)", textTransform: "uppercase", letterSpacing: "0.06em",
-                boxShadow: "0 2px 12px rgba(45,122,45,0.15)",
-              }}
-            >
-              ⚽ Predict This Match
-            </div>
+            <div className="match-pill match-pill-predict">⚽ Predict This Match</div>
           )}
         </div>
-        </LazyGlass>
       </div>
     </Link>
   )

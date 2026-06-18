@@ -1,5 +1,5 @@
 "use client"
-import { type CSSProperties, forwardRef, useCallback, useEffect, useId, useRef, useState } from "react"
+import React, { type CSSProperties, useCallback, useEffect, useId, useRef, useState } from "react"
 import { displacementMap, polarDisplacementMap, prominentDisplacementMap } from "./utils"
 
 const getMap = (m: "standard" | "polar" | "prominent") =>

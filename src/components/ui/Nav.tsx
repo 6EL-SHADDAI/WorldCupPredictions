@@ -201,18 +201,22 @@ export default function Nav() {
           <div style={{ fontSize: 12, color: "var(--chalk-faint)", flexShrink: 0 }}>Predict to join</div>
         )}
 
-        {/* Mobile hamburger */}
+        {/* Mobile hamburger - always show, with "Menu" label */}
         <button
           className="mobile-nav-toggle"
           onClick={() => setMobileOpen((o) => !o)}
           style={{
             display: "none",
-            width: 38, height: 38, borderRadius: 999,
+            alignItems: "center", justifyContent: "center",
+            gap: 6, cursor: "pointer",
             background: "rgba(45,122,45,0.1)", border: "1px solid rgba(45,122,45,0.2)",
-            alignItems: "center", justifyContent: "center", cursor: "pointer",
+            borderRadius: 999, padding: "6px 14px",
           }}
         >
-          <span style={{ fontSize: 18 }}>{mobileOpen ? "✕" : "☰"}</span>
+          <span style={{ fontSize: 16, lineHeight: 1 }}>{mobileOpen ? "✕" : "☰"}</span>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--chalk)" }}>
+            {mobileOpen ? "Close" : "Menu"}
+          </span>
         </button>
       </div>
 
@@ -222,9 +226,9 @@ export default function Nav() {
           className="mobile-nav-panel"
           style={{
             display: "none",
-            padding: "8px 16px 16px",
-            background: "rgba(255,255,255,0.85)",
-            backdropFilter: "blur(20px)",
+            padding: "8px 16px 20px",
+            background: "rgba(255,255,255,0.92)",
+            backdropFilter: "blur(20px) saturate(180%)",
             borderTop: "1px solid rgba(45,122,45,0.1)",
           }}
         >
@@ -234,8 +238,8 @@ export default function Nav() {
               href={link.href}
               onClick={() => setMobileOpen(false)}
               style={{
-                display: "block", padding: "12px 14px", borderRadius: 10,
-                fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14,
+                display: "flex", alignItems: "center", padding: "13px 16px", borderRadius: 12,
+                fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15,
                 textTransform: "uppercase", letterSpacing: "0.05em",
                 color: pathname === link.href ? "#fff" : "var(--chalk)",
                 background: pathname === link.href ? "var(--grass)" : "transparent",
@@ -245,21 +249,31 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
-          {anonId && (
+          {/* My Stats always shows on mobile regardless of login state */}
+          {anonId ? (
             <Link
               href={`/profile/${anonId}`}
               onClick={() => setMobileOpen(false)}
               style={{
-                display: "block", padding: "12px 14px", borderRadius: 10,
-                fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14,
+                display: "flex", alignItems: "center", padding: "13px 16px", borderRadius: 12,
+                fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15,
                 textTransform: "uppercase", letterSpacing: "0.05em",
                 color: pathname === `/profile/${anonId}` ? "#fff" : "var(--chalk)",
                 background: pathname === `/profile/${anonId}` ? "var(--grass)" : "transparent",
-                textDecoration: "none",
+                textDecoration: "none", marginBottom: 4,
               }}
             >
               My Stats
             </Link>
+          ) : (
+            <div style={{ padding: "13px 16px", fontSize: 13, color: "var(--chalk-faint)" }}>
+              Make a prediction to unlock My Stats
+            </div>
+          )}
+          {anonId && username && (
+            <div style={{ marginTop: 8, padding: "10px 16px", borderTop: "1px solid rgba(45,122,45,0.1)", fontSize: 13, color: "var(--chalk-faint)" }}>
+              Signed in as <strong style={{ color: "var(--chalk)" }}>@{username}</strong>
+            </div>
           )}
         </div>
       )}
