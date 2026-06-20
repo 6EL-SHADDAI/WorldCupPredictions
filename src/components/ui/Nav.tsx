@@ -2,7 +2,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import LiquidGlass from "./liquid-glass/LiquidGlass"
 
 const links = [
   { href: "/", label: "Matches" },
@@ -104,20 +103,7 @@ export default function Nav() {
         </Link>
 
         {/* Desktop glass pill nav + My Stats together */}
-        <LiquidGlass
-          className="glass-pill-track"
-          layout="inline"
-          mode="standard"
-          displacementScale={42}
-          blurAmount={0.08}
-          saturation={170}
-          aberrationIntensity={1.8}
-          elasticity={0}
-          cornerRadius={999}
-          padding="3px"
-          tint="rgba(45,122,45,0.04)"
-          contentColor="var(--chalk)"
-        >
+        <div className="glass-pill-track pill-track">
           <div
             style={{
               display: "flex",
@@ -132,7 +118,7 @@ export default function Nav() {
             <NavPill href={`/profile/${anonId}`} label="My Stats" active={pathname === `/profile/${anonId}`} />
           )}
           </div>
-        </LiquidGlass>
+        </div>
 
         {/* User corner */}
         {anonId ? (

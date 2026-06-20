@@ -1,11 +1,8 @@
-"use client"
-import LiquidGlass from "./liquid-glass/LiquidGlass"
 import type { CSSProperties, ReactNode } from "react"
 
 /**
- * Drop-in replacement for className="card" — same visual footprint (rounded
- * rect, padding controlled by caller) but with true Apple-style liquid glass
- * refraction instead of flat backdrop-blur.
+ * Drop-in replacement for className="card" — seamless CSS glass (blur +
+ * saturate, no hard border, no SVG displacement filter).
  */
 export default function GlassCard({
   children,
@@ -25,23 +22,19 @@ export default function GlassCard({
   className?: string
 }) {
   return (
-    <LiquidGlass
-      layout="inline"
-      mode="standard"
-      displacementScale={50}
-      blurAmount={0.09}
-      saturation={150}
-      aberrationIntensity={1.4}
-      elasticity={0.08}
-      cornerRadius={cornerRadius}
-      padding={padding}
-      tint={tint}
-      contentColor="var(--chalk)"
+    <div
+      className={`glass-row ${className}`}
       onClick={onClick}
-      className={className}
-      style={{ width: "100%", ...style }}
+      style={{
+        borderRadius: cornerRadius,
+        padding,
+        background: tint,
+        cursor: onClick ? "pointer" : undefined,
+        width: "100%",
+        ...style,
+      }}
     >
       {children}
-    </LiquidGlass>
+    </div>
   )
 }

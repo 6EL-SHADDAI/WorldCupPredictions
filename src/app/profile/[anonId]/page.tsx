@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import LiquidGlass from "@/components/ui/liquid-glass/LiquidGlass"
 import LazyGlass from "@/components/ui/LazyGlass"
 
 type StreakData = {
@@ -123,18 +122,13 @@ export default function ProfilePage() {
 
       {/* New badge celebration */}
       {newBadge && (
-        <LiquidGlass
-          layout="inline" mode="standard" displacementScale={50} blurAmount={0.09}
-          saturation={170} aberrationIntensity={1.6} elasticity={0} cornerRadius={16}
-          padding="20px 24px" tint={`${newBadge.color}22`}
-          style={{ width: "100%", marginBottom: 20, textAlign: "center" }}
-        >
+        <div className="glass-row" style={{ padding: "20px 24px", background: `${newBadge.color}22`, width: "100%", marginBottom: 20, textAlign: "center" }}>
           <div style={{ fontSize: 40, marginBottom: 4 }}>{newBadge.emoji}</div>
           <div className="display" style={{ fontSize: 20, fontWeight: 900, textTransform: "uppercase", color: newBadge.color }}>Badge unlocked!</div>
           <div style={{ fontSize: 15, fontWeight: 600, color: "var(--chalk)", marginTop: 4 }}>{newBadge.name}</div>
           <div style={{ fontSize: 13, color: "var(--chalk-dim)", marginTop: 4 }}>{newBadge.description}</div>
           <button onClick={() => setNewBadge(null)} style={{ marginTop: 10, background: "transparent", border: "none", color: "var(--chalk-faint)", cursor: "pointer", fontSize: 12 }}>Dismiss</button>
-        </LiquidGlass>
+        </div>
       )}
 
       {/* Header */}
@@ -193,11 +187,7 @@ export default function ProfilePage() {
 
       {/* Stats row */}
       {streak && (
-        <LiquidGlass
-          layout="inline" mode="standard" displacementScale={45} blurAmount={0.09}
-          saturation={160} aberrationIntensity={1.4} elasticity={0} cornerRadius={14}
-          padding="24px" tint="rgba(45,122,45,0.04)" style={{ width: "100%", marginBottom: 20 }}
-        >
+        <div className="glass-row" style={{ background: "rgba(45,122,45,0.04)", padding: "24px", width: "100%", marginBottom: 20 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 20 }}>
           {[
             { value: streak.currentStreak, label: "Streak", suffix: streak.currentStreak > 0 ? " 🔥" : "", color: "var(--gold)" },
@@ -212,16 +202,12 @@ export default function ProfilePage() {
             </div>
           ))}
           </div>
-        </LiquidGlass>
+        </div>
       )}
 
       {/* Badges */}
       {badges.length > 0 && (
-        <LiquidGlass
-          layout="inline" mode="standard" displacementScale={40} blurAmount={0.08}
-          saturation={155} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
-          padding="20px 24px" tint="rgba(184,134,11,0.05)" style={{ width: "100%", marginBottom: 20 }}
-        >
+        <div className="glass-row" style={{ background: "rgba(184,134,11,0.05)", padding: "20px 24px", width: "100%", marginBottom: 20 }}>
           <div className="display" style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--chalk-dim)", marginBottom: 14 }}>
             Badges Earned
           </div>
@@ -244,16 +230,12 @@ export default function ProfilePage() {
               </div>
             ))}
           </div>
-        </LiquidGlass>
+        </div>
       )}
 
       {/* Badges to unlock (teaser) */}
       {isOwn && badges.length < 11 && (
-        <LiquidGlass
-          layout="inline" mode="standard" displacementScale={32} blurAmount={0.06}
-          saturation={130} aberrationIntensity={1} elasticity={0} cornerRadius={14}
-          padding="16px 20px" tint="rgba(0,0,0,0.02)" style={{ width: "100%", marginBottom: 20 }}
-        >
+        <div className="glass-row" style={{ background: "rgba(0,0,0,0.02)", padding: "16px 20px", width: "100%", marginBottom: 20 }}>
           <div className="display" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--chalk-faint)", marginBottom: 10 }}>
             Still to unlock
           </div>
@@ -276,16 +258,12 @@ export default function ProfilePage() {
                 </div>
               ))}
           </div>
-        </LiquidGlass>
+        </div>
       )}
 
       {/* Accuracy by type */}
       {Object.keys(accuracyByKey).length > 0 && (
-        <LiquidGlass
-          layout="inline" mode="standard" displacementScale={40} blurAmount={0.08}
-          saturation={155} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
-          padding="20px 24px" tint="rgba(45,122,45,0.04)" style={{ width: "100%", marginBottom: 20 }}
-        >
+        <div className="glass-row" style={{ background: "rgba(45,122,45,0.04)", padding: "20px 24px", width: "100%", marginBottom: 20 }}>
           <div className="display" style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--chalk-dim)", marginBottom: 16 }}>
             Accuracy by Category
           </div>
@@ -307,7 +285,7 @@ export default function ProfilePage() {
               )
             })}
           </div>
-        </LiquidGlass>
+        </div>
       )}
 
       {/* Match history */}

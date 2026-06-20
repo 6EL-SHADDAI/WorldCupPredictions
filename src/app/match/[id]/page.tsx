@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { flagUrl } from "@/lib/flags"
-import LiquidGlass from "@/components/ui/liquid-glass/LiquidGlass"
 import LazyGlass from "@/components/ui/LazyGlass"
 
 type Option = { value: string; label: string }
@@ -44,26 +43,10 @@ function FlagHeader({ match }: { match: MatchData }) {
   const isLive = match.status === "live"
 
   return (
-    <LiquidGlass
-      layout="inline"
-      mode="standard"
-      displacementScale={60}
-      blurAmount={0.1}
-      saturation={170}
-      aberrationIntensity={1.8}
-      elasticity={0}
-      cornerRadius={14}
-      padding="0px"
-      tint="rgba(255,255,255,0.02)"
-      style={{ width: "100%", marginBottom: 28, position: "relative", overflow: "hidden" }}
-    >
-      <div style={{ position: "absolute", inset: 0, display: "flex" }}>
-        <div style={{ flex: 1, backgroundImage: homeFlag ? `url(${homeFlag})` : undefined, backgroundSize: "cover", backgroundPosition: "center", position: "relative" }}>
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.87) 100%)" }} />
-        </div>
-        <div style={{ flex: 1, backgroundImage: awayFlag ? `url(${awayFlag})` : undefined, backgroundSize: "cover", backgroundPosition: "center", position: "relative" }}>
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(255,255,255,0.87) 0%, rgba(255,255,255,0.75) 100%)" }} />
-        </div>
+    <div className="match-header-card" style={{ marginBottom: 28 }}>
+      <div className="match-card-flags">
+        <div className="match-card-flag-half" style={{ backgroundImage: homeFlag ? `url(${homeFlag})` : undefined }} />
+        <div className="match-card-flag-half" style={{ backgroundImage: awayFlag ? `url(${awayFlag})` : undefined }} />
       </div>
       <div style={{ position: "relative", zIndex: 1, padding: "28px 24px", textAlign: "center" }}>
         <div style={{ fontSize: 12, color: "var(--chalk-dim)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 16 }}>
@@ -95,7 +78,7 @@ function FlagHeader({ match }: { match: MatchData }) {
           </div>
         </div>
       </div>
-    </LiquidGlass>
+    </div>
   )
 }
 
@@ -200,21 +183,13 @@ export default function MatchPage() {
       {alreadyPredicted && myPrediction && (
         <>
           {submitted && (
-            <LiquidGlass
-              layout="inline" mode="standard" displacementScale={36} blurAmount={0.08}
-              saturation={170} aberrationIntensity={1.5} elasticity={0} cornerRadius={14}
-              padding="20px 24px" tint="rgba(45,122,45,0.14)" style={{ width: "100%", marginBottom: 20, textAlign: "center" }}
-            >
+            <div className="glass-row" style={{ background: "rgba(45,122,45,0.14)", padding: "20px 24px", width: "100%", marginBottom: 20, textAlign: "center" }}>
               <div style={{ fontSize: 32, marginBottom: 4 }}>✅</div>
               <div className="display" style={{ fontSize: 18, fontWeight: 800, textTransform: "uppercase", color: "var(--grass)" }}>Prediction locked in!</div>
-            </LiquidGlass>
+            </div>
           )}
 
-          <LiquidGlass
-            layout="inline" mode="standard" displacementScale={40} blurAmount={0.08}
-            saturation={155} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
-            padding="24px" tint="rgba(45,122,45,0.04)" style={{ width: "100%", marginBottom: 20 }}
-          >
+          <div className="glass-row" style={{ background: "rgba(45,122,45,0.04)", padding: "24px", width: "100%", marginBottom: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <span className="display" style={{ fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", color: "var(--chalk-dim)" }}>
                 Your Prediction
@@ -255,14 +230,10 @@ export default function MatchPage() {
                 </span>
               </div>
             </div>
-          </LiquidGlass>
+          </div>
 
           {crowd && crowd.percentages.winner && (
-            <LiquidGlass
-              layout="inline" mode="standard" displacementScale={40} blurAmount={0.08}
-              saturation={155} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
-              padding="24px" tint="rgba(45,122,45,0.04)" style={{ width: "100%", marginBottom: 20 }}
-            >
+            <div className="glass-row" style={{ background: "rgba(45,122,45,0.04)", padding: "24px", width: "100%", marginBottom: 20 }}>
               <div className="display" style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--chalk-faint)", marginBottom: 14 }}>
                 🧠 How the crowd voted
               </div>
@@ -280,7 +251,7 @@ export default function MatchPage() {
                   isCorrect={isFinished && questions.find((q) => q.questionKey === "winner")?.correctAnswer === value}
                 />
               ))}
-            </LiquidGlass>
+            </div>
           )}
 
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
@@ -300,26 +271,15 @@ export default function MatchPage() {
           )}
 
           {isLocked && !isFinished && (
-            <LiquidGlass
-              layout="inline" mode="standard" displacementScale={36} blurAmount={0.08}
-              saturation={150} aberrationIntensity={1.3} elasticity={0} cornerRadius={14}
-              padding="20px" tint="rgba(217,43,43,0.08)" style={{ width: "100%", marginBottom: 24, textAlign: "center" }}
-            >
+            <div className="glass-row" style={{ background: "rgba(217,43,43,0.08)", padding: "20px", width: "100%", marginBottom: 24, textAlign: "center" }}>
               <p style={{ color: "var(--chalk-dim)", fontSize: 14 }}>Predictions are closed — this match has kicked off.</p>
-            </LiquidGlass>
+            </div>
           )}
 
           {!isFinished && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {mainQuestions.map((q, i) => (
-                <LiquidGlass
-                  key={q.id}
-                  layout="inline" mode="standard" displacementScale={36} blurAmount={0.07}
-                  saturation={150} aberrationIntensity={1.2} elasticity={0.04} cornerRadius={14}
-                  padding="20px 24px" tint="rgba(255,255,255,0.03)"
-                  style={{ width: "100%", animationDelay: `${i * 0.05}s` }}
-                  className="fade-in"
-                >
+                <div className="glass-row" style={{ background: "rgba(255,255,255,0.03)", padding: "20px 24px", width: "100%", animationDelay: `${i * 0.05}s` }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
                     <span className="display" style={{ fontSize: 13, fontWeight: 700, color: "var(--grass)", letterSpacing: "0.06em" }}>Q{i + 1}</span>
                     <span style={{ fontSize: 15, fontWeight: 500, color: "var(--chalk)" }}>{q.questionText}</span>
@@ -346,15 +306,11 @@ export default function MatchPage() {
                       )
                     })}
                   </div>
-                </LiquidGlass>
+                </div>
               ))}
 
               {!isLocked && mainQuestions.length > 0 && (
-                <LiquidGlass
-                  layout="inline" mode="standard" displacementScale={36} blurAmount={0.07}
-                  saturation={150} aberrationIntensity={1.2} elasticity={0} cornerRadius={14}
-                  padding="20px 24px" tint="rgba(232,193,74,0.06)" style={{ width: "100%" }}
-                >
+                <div className="glass-row" style={{ background: "rgba(232,193,74,0.06)", padding: "20px 24px", width: "100%" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
                     <span style={{ fontSize: 15, fontWeight: 500 }}>How confident are you?</span>
                     <span className="display" style={{ fontSize: 22, fontWeight: 800, color: "var(--gold)" }}>
@@ -366,7 +322,7 @@ export default function MatchPage() {
                     <span style={{ fontSize: 11, color: "var(--chalk-faint)" }}>Low</span>
                     <span style={{ fontSize: 11, color: "var(--chalk-faint)" }}>High (×2 pts if right, ×0 if wrong)</span>
                   </div>
-                </LiquidGlass>
+                </div>
               )}
 
               {!isLocked && (
