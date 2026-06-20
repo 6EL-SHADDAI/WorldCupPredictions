@@ -65,12 +65,20 @@ export default function ProfilePage() {
       fetch(`/api/profile/${anonId}`).then((r) => r.json()),
       fetch(`/api/badges/${anonId}`).then((r) => r.json()),
     ]).then(([profileData, badgeData]) => {
-      setProfile(profileData)
-      setBadges(badgeData.badges ?? [])
+      // The profile API returns { error: "..." } with no `predictions` field
+      // when the user has no streak and no predictions yet (e.g. a brand
+      // new visitor clicking "My Stats" before ever predicting). Treat that
+      // the same as "no profile" instead of crashing on .predictions.length.
+      if (profileData?.error) {
+        setProfile(null)
+      } else {
+        setProfile(profileData)
+      }
+      setBadges(badgeData?.badges ?? [])
       setLoading(false)
 
       // Show newest badge if just earned (awarded in last 60s)
-      const recent = (badgeData.badges ?? []).find((b: BadgeData) => {
+      const recent = (badgeData?.badges ?? []).find((b: BadgeData) => {
         return Date.now() - new Date(b.awardedAt).getTime() < 60000
       })
       if (recent) setNewBadge(recent)
@@ -102,16 +110,18 @@ export default function ProfilePage() {
     return <div style={{ maxWidth: 680, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}><div className="display" style={{ fontSize: 18, color: "var(--chalk-dim)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Loading profile...</div></div>
   }
 
-  if (!profile || (!profile.streak && profile.predictions.length === 0)) {
+  if (!profile || (!profile.streak && (!profile.predictions || profile.predictions.length === 0))) {
     return (
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}>
-        <p style={{ color: "var(--chalk-dim)" }}>No predictions found.</p>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>⚽</div>
+        <p className="display" style={{ fontSize: 22, fontWeight: 800, textTransform: "uppercase", color: "var(--chalk-dim)" }}>No predictions yet</p>
+        <p style={{ color: "var(--chalk-faint)", marginTop: 8, fontSize: 14 }}>Make your first prediction and your stats will show up here.</p>
         <Link href="/" className="btn-primary" style={{ marginTop: 20, display: "inline-flex" }}>Make your first prediction →</Link>
       </div>
     )
   }
 
-  const { streak, leaderboardRank, accuracyByKey, predictions } = profile
+  const { streak, leaderboardRank, accuracyByKey, predictions = [] } = profile
   const milestoneMsg = MILESTONE_MESSAGES.slice().reverse().find((m) => predictions.length >= m.threshold)
 
   return (
