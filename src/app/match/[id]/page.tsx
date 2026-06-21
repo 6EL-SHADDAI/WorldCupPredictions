@@ -52,9 +52,9 @@ function FlagHeader({ match }: { match: MatchData }) {
         <div style={{ fontSize: 12, color: "var(--chalk-dim)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.09em", marginBottom: 16 }}>
           {match.stage.replace(/_/g, " ")}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 16 }}>
-          <div style={{ textAlign: "right" }}>
-            <div className="display" style={{ fontSize: 28, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>{match.homeTeam}</div>
+        <div className="match-header-grid" style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 16 }}>
+          <div style={{ textAlign: "right", minWidth: 0 }}>
+            <div className="display match-header-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", textShadow: "0 1px 12px rgba(255,255,255,0.9)", overflowWrap: "break-word" }}>{match.homeTeam}</div>
             <div style={{ fontSize: 12, color: "var(--chalk-dim)", fontWeight: 700 }}>{match.homeTeamCode}</div>
           </div>
           <div>
@@ -72,8 +72,8 @@ function FlagHeader({ match }: { match: MatchData }) {
               {isFinished && <span className="badge badge-finished">Full Time</span>}
             </div>
           </div>
-          <div style={{ textAlign: "left" }}>
-            <div className="display" style={{ fontSize: 28, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", textShadow: "0 1px 12px rgba(255,255,255,0.9)" }}>{match.awayTeam}</div>
+          <div style={{ textAlign: "left", minWidth: 0 }}>
+            <div className="display match-header-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", textShadow: "0 1px 12px rgba(255,255,255,0.9)", overflowWrap: "break-word" }}>{match.awayTeam}</div>
             <div style={{ fontSize: 12, color: "var(--chalk-dim)", fontWeight: 700 }}>{match.awayTeamCode}</div>
           </div>
         </div>

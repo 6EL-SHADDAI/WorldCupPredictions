@@ -3,6 +3,7 @@ import "./globals.css"
 import Nav from "@/components/ui/Nav"
 import Ferrofluid from "@/components/ui/Ferrofluid"
 import AddToHomeScreenPrompt from "@/components/AddToHomeScreenPrompt"
+import OnboardingGate from "@/components/OnboardingGate"
 import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <Nav />
         <main className="min-h-screen">{children}</main>
+        <OnboardingGate />
         <AddToHomeScreenPrompt />
         <Analytics />
       </body>

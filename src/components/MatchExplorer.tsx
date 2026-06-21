@@ -98,8 +98,8 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
 
         {/* Content */}
         <div className="match-card-content">
-          <div style={{ textAlign: "right" }}>
-            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)" }}>
+          <div style={{ textAlign: "right", minWidth: 0 }}>
+            <div className="display match-card-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)", overflowWrap: "break-word" }}>
               {match.homeTeam}
             </div>
             <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 8px rgba(255,255,255,0.95)" }}>
@@ -107,7 +107,7 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
             </div>
           </div>
 
-          <div style={{ textAlign: "center", minWidth: 100 }}>
+          <div className="match-card-center" style={{ textAlign: "center" }}>
             {isFinished ? (
               <div className="display" style={{ fontSize: 30, fontWeight: 900, letterSpacing: "0.06em", color: "var(--chalk)", lineHeight: 1, textShadow: "0 1px 10px rgba(255,255,255,0.95)" }}>
                 {match.homeScore} <span style={{ color: "var(--chalk-faint)" }}>–</span> {match.awayScore}
@@ -129,8 +129,8 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
             </div>
           </div>
 
-          <div style={{ textAlign: "left" }}>
-            <div className="display" style={{ fontSize: 19, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)" }}>
+          <div style={{ textAlign: "left", minWidth: 0 }}>
+            <div className="display match-card-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)", overflowWrap: "break-word" }}>
               {match.awayTeam}
             </div>
             <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 8px rgba(255,255,255,0.95)" }}>

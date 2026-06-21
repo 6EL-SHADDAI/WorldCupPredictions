@@ -1,12 +1,11 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
 const links = [
   { href: "/", label: "Matches" },
   { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/hot-takes", label: "Hot Takes" },
 ]
 
 function NavPill({ href, label, active }: { href: string; label: string; active: boolean }) {
@@ -50,7 +49,6 @@ export default function Nav() {
   const pathname = usePathname()
   const [anonId, setAnonId] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
@@ -102,89 +100,45 @@ export default function Nav() {
           </span>
         </Link>
 
-        {/* Desktop glass pill nav + My Stats together */}
-        <div className="glass-pill-track pill-track">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-            }}
-          >
+        {/* Desktop glass pill nav */}
+        <div className="glass-pill-track pill-track desktop-nav-track">
+          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
             {links.map((link) => (
               <NavPill key={link.href} href={link.href} label={link.label} active={pathname === link.href} />
             ))}
-          {anonId && (
-            <NavPill href={`/profile/${anonId}`} label="My Stats" active={pathname === `/profile/${anonId}`} />
-          )}
           </div>
         </div>
 
-        {/* User corner */}
+        {/* User corner — username text links straight to stats, no dropdown */}
         {anonId ? (
-          <div style={{ position: "relative", flexShrink: 0 }}>
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                background: "rgba(45,122,45,0.1)",
-                border: "1px solid rgba(45,122,45,0.2)",
-                borderRadius: 999,
-                padding: "6px 14px",
-                cursor: "pointer",
-                color: "var(--chalk)",
-                fontSize: 13,
-                fontWeight: 600,
-                backdropFilter: "blur(8px)",
-              }}
-            >
-              <span style={{ fontSize: 15 }}>👤</span>
-              <span style={{ maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {username ? `@${username}` : "Profile"}
-              </span>
-              <span style={{ fontSize: 9, color: "var(--chalk-faint)" }}>▾</span>
-            </button>
-
-            {menuOpen && (
-              <>
-                <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 8px)",
-                    right: 0,
-                    background: "rgba(255,255,255,0.9)",
-                    backdropFilter: "blur(20px) saturate(180%)",
-                    border: "1px solid rgba(45,122,45,0.15)",
-                    borderRadius: 14,
-                    boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
-                    minWidth: 190,
-                    zIndex: 50,
-                    overflow: "hidden",
-                  }}
-                >
-                  {username && (
-                    <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(45,122,45,0.1)", fontSize: 12, color: "var(--chalk-faint)" }}>
-                      Signed in as <strong style={{ color: "var(--chalk)" }}>@{username}</strong>
-                    </div>
-                  )}
-                  <Link href={`/profile/${anonId}`} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500 }}>
-                    📊 My Stats
-                  </Link>
-                  <Link href={`/leaderboard?tab=friends`} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500 }}>
-                    👥 Friends Board
-                  </Link>
-                  <Link href={`/api/profile/${anonId}/card`} download onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "var(--chalk)", textDecoration: "none", fontWeight: 500, borderTop: "1px solid rgba(45,122,45,0.1)" }}>
-                    📸 Download Card
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
+          <Link
+            href={`/profile/${anonId}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              background: "rgba(45,122,45,0.1)",
+              border: "1px solid rgba(45,122,45,0.2)",
+              borderRadius: 999,
+              padding: "6px 14px",
+              cursor: "pointer",
+              color: "var(--chalk)",
+              fontSize: 13,
+              fontWeight: 600,
+              backdropFilter: "blur(8px)",
+              textDecoration: "none",
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ fontSize: 15 }}>👤</span>
+            <span style={{ maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {username ? `@${username}` : "My Stats"}
+            </span>
+          </Link>
         ) : (
-          <div style={{ fontSize: 12, color: "var(--chalk-faint)", flexShrink: 0 }}>Predict to join</div>
+          <Link href="/recover" style={{ fontSize: 12, color: "var(--chalk-faint)", flexShrink: 0, textDecoration: "underline" }}>
+            Already played? Recover
+          </Link>
         )}
 
         {/* Mobile hamburger - always show, with "Menu" label */}
@@ -235,7 +189,6 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
-          {/* My Stats always shows on mobile regardless of login state */}
           {anonId ? (
             <Link
               href={`/profile/${anonId}`}
@@ -249,24 +202,27 @@ export default function Nav() {
                 textDecoration: "none", marginBottom: 4,
               }}
             >
-              My Stats
+              {username ? `@${username}` : "My Stats"}
             </Link>
           ) : (
-            <div style={{ padding: "13px 16px", fontSize: 13, color: "var(--chalk-faint)" }}>
-              Make a prediction to unlock My Stats
-            </div>
-          )}
-          {anonId && username && (
-            <div style={{ marginTop: 8, padding: "10px 16px", borderTop: "1px solid rgba(45,122,45,0.1)", fontSize: 13, color: "var(--chalk-faint)" }}>
-              Signed in as <strong style={{ color: "var(--chalk)" }}>@{username}</strong>
-            </div>
+            <Link
+              href="/recover"
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "flex", alignItems: "center", padding: "13px 16px", borderRadius: 12,
+                fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14,
+                color: "var(--chalk-dim)", textDecoration: "underline",
+              }}
+            >
+              Already played? Recover account
+            </Link>
           )}
         </div>
       )}
 
       <style>{`
         @media (max-width: 720px) {
-          .glass-pill-track { display: none !important; }
+          .desktop-nav-track { display: none !important; }
           .mobile-nav-toggle { display: flex !important; }
           .mobile-nav-panel { display: block !important; }
         }
