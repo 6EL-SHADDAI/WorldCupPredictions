@@ -106,6 +106,9 @@ export default function Nav() {
             {links.map((link) => (
               <NavPill key={link.href} href={link.href} label={link.label} active={pathname === link.href} />
             ))}
+            {anonId && (
+              <NavPill href={`/profile/${anonId}`} label="My Stats" active={pathname === `/profile/${anonId}`} />
+            )}
           </div>
         </div>
 

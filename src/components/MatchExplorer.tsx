@@ -142,8 +142,10 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
         {/* Action pill */}
         <div className="match-card-action">
           {isFinished ? (
-            <div className="match-pill match-pill-neutral">
-              {hasPredicted ? "📊 View Your Result" : "📊 View Results"}
+            <div className="match-pill match-pill-results">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/rankings.png" alt="" style={{ width: 14, height: 14, objectFit: "contain", opacity: 0.75 }} />
+              {hasPredicted ? "View Your Result" : "View Results"}
             </div>
           ) : hasPredicted ? (
             <div className="match-pill match-pill-locked">✓ Prediction Locked In</div>

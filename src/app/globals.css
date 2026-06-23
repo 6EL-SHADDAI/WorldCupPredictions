@@ -293,6 +293,14 @@ html {
   border: 1px solid rgba(45,122,45,0.22);
   color: var(--grass);
 }
+.match-pill-results {
+  background: rgba(90, 107, 88, 0.12);
+  border: 1px solid rgba(90, 107, 88, 0.2);
+  color: var(--chalk-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 
 /* Seamless stat tile — no hard border, soft glass only */
 .stat-tile {
