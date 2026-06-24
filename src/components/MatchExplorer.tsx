@@ -148,9 +148,17 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
               {hasPredicted ? "View Your Result" : "View Results"}
             </div>
           ) : hasPredicted ? (
-            <div className="match-pill match-pill-locked">✓ Prediction Locked In</div>
+            <div className="match-pill match-pill-locked">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon-192.png" alt="" style={{ width: 14, height: 14, objectFit: "contain", borderRadius: 3 }} />
+              Prediction Locked In
+            </div>
           ) : (
-            <div className="match-pill match-pill-predict">⚽ Predict This Match</div>
+            <div className="match-pill match-pill-predict">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon-192.png" alt="" style={{ width: 14, height: 14, objectFit: "contain", borderRadius: 3 }} />
+              Predict This Match
+            </div>
           )}
         </div>
       </div>
