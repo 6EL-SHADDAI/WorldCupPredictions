@@ -89,7 +89,7 @@ function UserCard({ user, rank, isMe, isFriend, onRemove }: {
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 3, flexWrap: "wrap" }}>
           <span style={{ fontSize: 12, color: "var(--chalk-faint)" }}>{user.totalPredictions} predicted</span>
-          {user.currentStreak > 0 && <span style={{ fontSize: 12, color: "var(--gold)" }}>🔥 {user.currentStreak}</span>}
+          {user.currentStreak > 0 && <span style={{ fontSize: 12, color: "var(--gold)" }}> {user.currentStreak}</span>}
         </div>
       </div>
 

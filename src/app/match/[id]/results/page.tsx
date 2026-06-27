@@ -172,7 +172,7 @@ export default function ResultsPage() {
                 </span>
                 {isControversial && (
                   <span className="badge" style={{ background: "rgba(232,193,74,0.15)", color: "var(--gold)" }}>
-                    🔥 Split crowd
+                     Split crowd
                   </span>
                 )}
               </div>

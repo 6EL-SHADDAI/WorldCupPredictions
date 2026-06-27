@@ -186,10 +186,10 @@ export default function ProfilePage() {
         {isOwn && (
           <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
             <a href={`/api/profile/${anonId}/card`} download={`vibe-checker-${profile.username ?? anonId.slice(0, 6)}.png`} className="btn-primary" style={{ display: "inline-flex" }}>
-              📸 Download Card
+              Download Card
             </a>
             <Link href="/leaderboard?tab=friends" className="btn-secondary" style={{ display: "inline-flex" }}>
-              👥 Friends Board
+               Friends Board
             </Link>
           </div>
         )}

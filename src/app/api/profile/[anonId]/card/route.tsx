@@ -129,7 +129,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ anon
           {/* stats grid */}
           <div style={{ display: "flex", flex: 1, gap: "24px" }}>
             {[
-              { label: "Current Streak", value: `${currentStreak}🔥`, color: "#b8860b" },
+              { label: "Current Streak", value: `${currentStreak}`, color: "#b8860b" },
               { label: "Best Streak", value: `${bestStreak}`, color: "#16201a" },
               { label: "Accuracy", value: `${accuracy}%`, color: "#2d7a2d" },
               { label: "Predictions", value: `${totalPredictions}`, color: "#16201a" },
