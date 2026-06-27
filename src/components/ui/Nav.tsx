@@ -64,8 +64,8 @@ export default function Nav() {
   return (
     <nav
       style={{
-        background: "rgba(255,255,255,0.55)",
-        borderBottom: "1px solid rgba(45,122,45,0.12)",
+        background: "rgba(10,15,10,0.85)",
+        borderBottom: "1px solid rgba(58,170,58,0.15)",
         backdropFilter: "blur(20px) saturate(180%)",
         WebkitBackdropFilter: "blur(20px) saturate(180%)",
         position: "sticky",
@@ -170,7 +170,7 @@ export default function Nav() {
           style={{
             display: "none",
             padding: "8px 16px 20px",
-            background: "rgba(255,255,255,0.92)",
+            background: "rgba(10,15,10,0.92)",
             backdropFilter: "blur(20px) saturate(180%)",
             borderTop: "1px solid rgba(45,122,45,0.1)",
           }}

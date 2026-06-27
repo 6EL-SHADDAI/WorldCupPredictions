@@ -7,6 +7,8 @@ export type QuestionTemplate = {
   isKnockoutOnly: boolean
   sortOrder: number
   points: number // base points if correct
+  isScoreInput?: boolean // renders as two number steppers instead of option buttons
+  noConfidenceMultiplier?: boolean // if true, confidence multiplier does NOT apply
 }
 
 // ─── Scoring constants ────────────────────────────────────────────────────────
@@ -19,6 +21,7 @@ export const SCORING = {
   first_goal_nation: 1,
   match_vibe: 1,
   wildcard: 2,
+  exact_score: 10, // fixed bonus — correct gets +10, wrong gets 0, no confidence multiplier
   // Q8 (confidence) is a multiplier, not a standalone question
 } as const
 
@@ -119,6 +122,16 @@ export const QUESTION_TEMPLATES: QuestionTemplate[] = [
     isKnockoutOnly: false,
     sortOrder: 7,
     points: SCORING.wildcard,
+  },
+  {
+    key: "exact_score",
+    text: (home, away) => `Exact score? (${home} – ${away})`,
+    options: () => [], // rendered as number steppers, not option buttons
+    isKnockoutOnly: false,
+    sortOrder: 8,
+    points: SCORING.exact_score,
+    isScoreInput: true,
+    noConfidenceMultiplier: true, // bonus is flat — confidence doesn't affect it
   },
   {
     key: "confidence",

@@ -99,17 +99,17 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
         {/* Content */}
         <div className="match-card-content">
           <div style={{ textAlign: "right", minWidth: 0 }}>
-            <div className="display match-card-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)", overflowWrap: "break-word" }}>
+            <div className="display match-card-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 8px rgba(0,0,0,0.8)", overflowWrap: "break-word" }}>
               {match.homeTeam}
             </div>
-            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 8px rgba(255,255,255,0.95)" }}>
+            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>
               {match.homeTeamCode}
             </div>
           </div>
 
           <div className="match-card-center" style={{ textAlign: "center" }}>
             {isFinished ? (
-              <div className="display" style={{ fontSize: 30, fontWeight: 900, letterSpacing: "0.06em", color: "var(--chalk)", lineHeight: 1, textShadow: "0 1px 10px rgba(255,255,255,0.95)" }}>
+              <div className="display" style={{ fontSize: 30, fontWeight: 900, letterSpacing: "0.06em", color: "var(--chalk)", lineHeight: 1, textShadow: "0 1px 8px rgba(0,0,0,0.8)" }}>
                 {match.homeScore} <span style={{ color: "var(--chalk-faint)" }}>–</span> {match.awayScore}
               </div>
             ) : isLive ? (
@@ -130,10 +130,10 @@ function MatchCard({ match, hasPredicted }: { match: Match; hasPredicted: boolea
           </div>
 
           <div style={{ textAlign: "left", minWidth: 0 }}>
-            <div className="display match-card-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 10px rgba(255,255,255,0.95)", overflowWrap: "break-word" }}>
+            <div className="display match-card-team-name" style={{ fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em", color: "var(--chalk)", textShadow: "0 1px 8px rgba(0,0,0,0.8)", overflowWrap: "break-word" }}>
               {match.awayTeam}
             </div>
-            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 8px rgba(255,255,255,0.95)" }}>
+            <div style={{ fontSize: 11, color: "var(--chalk-dim)", fontWeight: 700, letterSpacing: "0.08em", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>
               {match.awayTeamCode}
             </div>
           </div>
@@ -213,7 +213,7 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
             placeholder="🔍 Search — Brazil, ARG, Japan..."
             style={{
               width: "100%", padding: "14px 18px", borderRadius: 12,
-              border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.55)",
+              border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.06)",
               backdropFilter: "blur(10px)", color: "var(--chalk)", fontSize: 15, outline: "none",
             }}
           />

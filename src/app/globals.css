@@ -5,18 +5,18 @@
 @tailwind utilities;
 
 :root {
-  /* Palette — white pitch theme */
-  --pitch: #ffffff;            /* page background — clean white */
-  --turf: #f4f9f3;             /* card surface — faint green tint */
-  --line: #d8e8d4;             /* subtle borders */
-  --line-bright: #a8d0a0;      /* brighter borders on hover */
-  --grass: #2d7a2d;            /* accent — grass green */
-  --grass-bright: #3aaa3a;     /* hover state */
+  /* Palette — dark pitch theme */
+  --pitch: #0a0f0a;            /* page background — near-black with green tint */
+  --turf: #111811;             /* card surface */
+  --line: #1e2e1e;             /* subtle borders */
+  --line-bright: #2d4a2d;      /* brighter borders */
+  --grass: #3aaa3a;            /* accent — grass green (brighter on dark) */
+  --grass-bright: #5dcc5d;     /* hover state */
   --gold: #b8860b;             /* streak / highlight gold (darker for contrast on white) */
   --red-card: #d92b2b;         /* danger / wrong */
-  --chalk: #16201a;            /* primary text — near-black green-grey */
-  --chalk-dim: #5a6b58;        /* secondary text */
-  --chalk-faint: #a3b3a0;      /* muted text */
+  --chalk: #e8f0e6;            /* primary text — near-white green-grey */
+  --chalk-dim: #9ab89a;        /* secondary text */
+  --chalk-faint: #5a7a5a;      /* muted text */
 
   /* Typography */
   --font-display: 'Space Grotesk', sans-serif;
@@ -69,16 +69,16 @@ html {
 
 /* Card base — glossy green glass */
 .card {
-  background: rgba(45, 122, 45, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 14px;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 4px 28px rgba(45, 122, 45, 0.08), inset 0 1px 0 rgba(255,255,255,0.5);
-  background-image: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.08) 100%);
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 40%, rgba(255,255,255,0.04) 100%);
   transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
 }
 .card:hover {
-  background: rgba(45, 122, 45, 0.11);
+  background: rgba(58, 170, 58, 0.10);
   transform: translateY(-1px);
 }
 
@@ -136,7 +136,7 @@ html {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.07);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
   color: var(--chalk-dim);
@@ -160,16 +160,16 @@ html {
   position: relative;
   border-radius: 16px;
   overflow: hidden;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.06);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  box-shadow: 0 4px 24px rgba(45,122,45,0.07), inset 0 1px 0 rgba(255,255,255,0.5);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .match-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(45,122,45,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.12);
 }
 
 /* Match detail page header — same flag treatment, no hover/click affordance */
@@ -177,10 +177,10 @@ html {
   position: relative;
   border-radius: 18px;
   overflow: hidden;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.05);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  box-shadow: 0 6px 28px rgba(45,122,45,0.08), inset 0 1px 0 rgba(255,255,255,0.5);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
 }
 
 .match-header-team-name {
@@ -294,27 +294,27 @@ html {
   gap: 6px;
 }
 .match-pill-neutral {
-  background: rgba(255,255,255,0.6);
-  border: 1px solid rgba(45,122,45,0.22);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(58,170,58,0.22);
   color: var(--grass);
 }
 .match-pill-results {
-  background: rgba(90, 107, 88, 0.12);
-  border: 1px solid rgba(90, 107, 88, 0.2);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
   color: var(--chalk-dim);
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-/* Seamless stat tile — no hard border, soft glass only */
+/* Seamless stat tile — dark glass */
 .stat-tile {
   padding: 14px 18px;
   border-radius: 16px;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.07);
   backdrop-filter: blur(14px) saturate(150%);
   -webkit-backdrop-filter: blur(14px) saturate(150%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 12px rgba(0,0,0,0.3);
 }
 
 /* Progress bar */
@@ -358,15 +358,15 @@ html {
 
 /* ── Seamless glass utilities (no SVG filter, no hard border) ──────────────── */
 .glass-row {
-  background: rgba(45,122,45,0.05);
+  background: rgba(255,255,255,0.05);
   backdrop-filter: blur(18px) saturate(170%);
   -webkit-backdrop-filter: blur(18px) saturate(170%);
-  box-shadow: 0 3px 18px rgba(45,122,45,0.07), inset 0 1px 0 rgba(255,255,255,0.45);
+  box-shadow: 0 3px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
   border-radius: 14px;
   transition: background 0.15s ease, transform 0.1s ease;
 }
 .glass-row:hover {
-  background: rgba(45,122,45,0.09);
+  background: rgba(58,170,58,0.08);
 }
 
 .pill-track {
@@ -375,8 +375,8 @@ html {
   gap: 3px;
   padding: 3px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.06);
   backdrop-filter: blur(14px) saturate(170%);
   -webkit-backdrop-filter: blur(14px) saturate(170%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
 }

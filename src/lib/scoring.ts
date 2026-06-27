@@ -75,6 +75,9 @@ export function deriveCorrectAnswers(match: Match): Record<string, string> {
   // Q7: wildcard — can't derive from score alone, requires events API
   // Set to null here; scoring cron should enrich via match events endpoint
 
+  // Q8: exact score — simply "homeScore-awayScore" e.g. "1-0", "2-2"
+  answers.exact_score = `${homeScore}-${awayScore}`
+
   return answers
 }
 
@@ -95,6 +98,9 @@ export function scorePrediction(
   const breakdown: ScoreBreakdown[] = []
 
   for (const question of questions) {
+    // exact_score is scored separately below — flat bonus, no confidence multiplier
+    if (question.key === "exact_score") continue
+
     const userAnswer = userAnswers[question.key]
     const correctAnswer = correctAnswers[question.key]
 
@@ -118,14 +124,36 @@ export function scorePrediction(
     })
   }
 
-  // Apply confidence multiplier to raw score
+  // Apply confidence multiplier to raw score (exact_score excluded above)
   const multiplier = confidenceMultiplier(confidence, rawScore > maxRawScore * 0.5)
   const score = Math.round(rawScore * multiplier)
   const maxPossibleScore = Math.round(maxRawScore * 2) // max is at confidence 5, all correct
 
+  // Exact score bonus — flat +10 if correct, 0 if wrong, added after multiplier
+  const exactScoreUserAnswer = userAnswers.exact_score
+  const exactScoreCorrect = correctAnswers.exact_score
+  let exactScoreBonus = 0
+  if (exactScoreUserAnswer && exactScoreCorrect) {
+    const isCorrect = exactScoreUserAnswer === exactScoreCorrect
+    exactScoreBonus = isCorrect ? SCORING.exact_score : 0
+    breakdown.push({
+      questionKey: "exact_score",
+      userAnswer: exactScoreUserAnswer,
+      correctAnswer: exactScoreCorrect,
+      isCorrect,
+      pointsEarned: exactScoreBonus,
+      pointsPossible: SCORING.exact_score,
+    })
+  }
+
   const correctWinner = userAnswers.winner === correctAnswers.winner
 
-  return { score, maxPossibleScore, breakdown, correctWinner }
+  return {
+    score: score + exactScoreBonus,
+    maxPossibleScore: maxPossibleScore + (exactScoreUserAnswer ? SCORING.exact_score : 0),
+    breakdown,
+    correctWinner,
+  }
 }
 
 /**
