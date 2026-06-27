@@ -299,7 +299,7 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
               position: "relative", transition: "background 0.25s ease, color 0.2s ease",
             }}
           >
-            {t === "global" ? "🌍 Global" : "👥 Friends"}
+            {t === "global" ? " Global" : " Friends"}
             {t === "friends" && incoming.length > 0 && (
               <span style={{ position: "absolute", top: -4, right: -4, background: "var(--red-card)", color: "#fff", borderRadius: "50%", width: 18, height: 18, fontSize: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {incoming.length}

@@ -14,7 +14,7 @@ type MyPrediction = { id: string; answers: Record<string, string>; confidence: n
 const QUESTION_LABELS: Record<string, string> = {
   winner: "Who wins?", margin: "Winning margin", extra_time: "Extra time?",
   penalties: "Penalties?", first_goal_nation: "First goal", match_vibe: "Match vibe", wildcard: "Wildcard event",
-  exact_score: "Exact Score 🎯",
+  exact_score: "Exact Score ",
 }
 
 function CrowdBar({ label, pct, count, isMyPick, isCorrect }: { label: string; pct: number; count: number; isMyPick?: boolean; isCorrect?: boolean }) {

@@ -210,7 +210,7 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="🔍 Search — Brazil, ARG, Japan..."
+            placeholder=" Search Country"
             style={{
               width: "100%", padding: "14px 18px", borderRadius: 12,
               border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.06)",
@@ -274,7 +274,7 @@ export default function MatchExplorer({ allMatches }: { allMatches: Match[] }) {
 
           {allMatches.length === 0 && (
             <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--chalk-faint)" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>⚽</div>
+              <div style={{ fontSize: 48, marginBottom: 16 }}></div>
               <p className="display" style={{ fontSize: 20, fontWeight: 700, textTransform: "uppercase" }}>No matches yet</p>
             </div>
           )}

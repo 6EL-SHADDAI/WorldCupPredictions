@@ -201,7 +201,7 @@ export default function ResultsPage() {
 
       <div style={{ marginTop: 28, display: "flex", gap: 10, flexWrap: "wrap" }}>
         <Link href="/" className="btn-secondary">All Matches</Link>
-        <Link href="/upsets" className="btn-secondary">Upset Hall of Fame</Link>
+        
       </div>
     </div>
   )

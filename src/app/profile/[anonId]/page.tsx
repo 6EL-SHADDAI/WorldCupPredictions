@@ -39,10 +39,10 @@ const KEY_LABELS: Record<string, string> = {
 }
 
 const MILESTONE_MESSAGES = [
-  { threshold: 1, msg: "🎯 First prediction in the books!" },
-  { threshold: 5, msg: "🔥 5 predictions — you're warming up!" },
-  { threshold: 10, msg: "⚡ 10 predictions — now we're talking!" },
-  { threshold: 25, msg: "🌟 25 predictions — legend in the making!" },
+  { threshold: 1, msg: " First prediction in the books!" },
+  { threshold: 5, msg: " 5 predictions — you're warming up!" },
+  { threshold: 10, msg: " 10 predictions — now we're talking!" },
+  { threshold: 25, msg: " 25 predictions — legend in the making!" },
 ]
 
 export default function ProfilePage() {
@@ -113,7 +113,7 @@ export default function ProfilePage() {
   if (!profile || (!profile.streak && (!profile.predictions || profile.predictions.length === 0))) {
     return (
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "80px 20px", textAlign: "center" }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>⚽</div>
+        <div style={{ fontSize: 40, marginBottom: 12 }}></div>
         <p className="display" style={{ fontSize: 22, fontWeight: 800, textTransform: "uppercase", color: "var(--chalk-dim)" }}>No predictions yet</p>
         <p style={{ color: "var(--chalk-faint)", marginTop: 8, fontSize: 14 }}>Make your first prediction and your stats will show up here.</p>
         <Link href="/" className="btn-primary" style={{ marginTop: 20, display: "inline-flex" }}>Make your first prediction →</Link>
@@ -200,7 +200,7 @@ export default function ProfilePage() {
         <div className="glass-row" style={{ background: "rgba(45,122,45,0.04)", padding: "24px", width: "100%", marginBottom: 20 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 20 }}>
           {[
-            { value: streak.currentStreak, label: "Streak", suffix: streak.currentStreak > 0 ? " 🔥" : "", color: "var(--gold)" },
+            { value: streak.currentStreak, label: "Streak", suffix: streak.currentStreak > 0 ? " " : "", color: "var(--gold)" },
             { value: streak.bestStreak, label: "Best", color: "var(--chalk)" },
             { value: streak.overallAccuracy ?? "–", label: "Accuracy", suffix: streak.overallAccuracy !== null ? "%" : "", color: "var(--grass)" },
             { value: streak.totalPredictions, label: "Predicted", color: "var(--chalk)" },
@@ -251,13 +251,13 @@ export default function ProfilePage() {
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {[
-              { key: "oracle", emoji: "🔮", name: "Oracle", description: "Best streak of 5+" },
-              { key: "upset_hunter", emoji: "😱", name: "Upset Hunter", description: "Predict 3 upsets" },
-              { key: "sniper", emoji: "🎯", name: "Sniper", description: "3 perfect matches" },
-              { key: "legendary", emoji: "🌟", name: "Legendary", description: "10-game win streak" },
-              { key: "sharp", emoji: "🗡️", name: "Sharp", description: "70%+ accuracy over 5 matches" },
-              { key: "high_roller", emoji: "💎", name: "High Roller", description: "5 high-confidence picks" },
-              { key: "group_survivor", emoji: "🌍", name: "Group Survivor", description: "Predict 10+ matches" },
+              { key: "oracle", emoji: "", name: "Oracle", description: "Best streak of 5+" },
+              { key: "upset_hunter", emoji: "", name: "Upset Hunter", description: "Predict 3 upsets" },
+              { key: "sniper", emoji: "", name: "Sniper", description: "3 perfect matches" },
+              { key: "legendary", emoji: "", name: "Legendary", description: "10-game win streak" },
+              { key: "sharp", emoji: "", name: "Sharp", description: "70%+ accuracy over 5 matches" },
+              { key: "high_roller", emoji: "", name: "High Roller", description: "5 high-confidence picks" },
+              { key: "group_survivor", emoji: "", name: "Group Survivor", description: "Predict 10+ matches" },
             ]
               .filter((b) => !badges.find((earned) => earned.key === b.key))
               .slice(0, 5)
