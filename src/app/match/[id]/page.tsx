@@ -214,7 +214,7 @@ export default function MatchPage() {
         <>
           {submitted && (
             <div className="glass-row" style={{ background: "rgba(45,122,45,0.14)", padding: "20px 24px", width: "100%", marginBottom: 20, textAlign: "center" }}>
-              <div style={{ fontSize: 32, marginBottom: 4 }}>✅</div>
+              <div style={{ fontSize: 32, marginBottom: 4 }}></div>
               <div className="display" style={{ fontSize: 18, fontWeight: 800, textTransform: "uppercase", color: "var(--grass)" }}>Prediction locked in!</div>
             </div>
           )}
