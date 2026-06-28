@@ -133,7 +133,7 @@ export default function Nav() {
               flexShrink: 0,
             }}
           >
-            <span style={{ fontSize: 15 }}>👤</span>
+            <span style={{ fontSize: 15 }}></span>
             <span style={{ maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {username ? `@${username}` : "My Stats"}
             </span>

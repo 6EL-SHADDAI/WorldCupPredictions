@@ -386,7 +386,7 @@ export default function LeaderboardClient({ users }: { users: UserRow[] }) {
           </div>
           {friendRows.length === 0 ? (
             <div className="card" style={{ padding: "40px 20px", textAlign: "center" }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>👥</div>
+              <div style={{ fontSize: 36, marginBottom: 10 }}></div>
               <p className="display" style={{ fontSize: 18, fontWeight: 700, color: "var(--chalk-dim)" }}>No friends yet</p>
               <p style={{ color: "var(--chalk-faint)", fontSize: 14, marginTop: 8 }}>Send a request by username above. They&apos;ll need to accept before you both show up on each other&apos;s friends board.</p>
             </div>
