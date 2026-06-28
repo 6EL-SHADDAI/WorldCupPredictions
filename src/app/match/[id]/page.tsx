@@ -14,7 +14,7 @@ type MyPrediction = { id: string; answers: Record<string, string>; confidence: n
 const QUESTION_LABELS: Record<string, string> = {
   winner: "Who wins?", margin: "Winning margin", extra_time: "Extra time?",
   penalties: "Penalties?", first_goal_nation: "First goal", match_vibe: "Match vibe", wildcard: "Wildcard event",
-  exact_score: "Exact Score ",
+  exact_score: "Exact Score",
 }
 
 function CrowdBar({ label, pct, count, isMyPick, isCorrect }: { label: string; pct: number; count: number; isMyPick?: boolean; isCorrect?: boolean }) {
@@ -122,10 +122,14 @@ export default function MatchPage() {
       .catch(() => setLoading(false))
   }, [id, anonUserId])
 
+  // exact_score is always rendered client-side — never depends on API returning a question for it
   const mainQuestions = questions.filter((q) => q.questionKey !== "confidence")
   const regularQuestions = mainQuestions.filter((q) => q.questionKey !== "exact_score")
-  const hasExactScoreQuestion = mainQuestions.some((q) => q.questionKey === "exact_score")
-  const allAnswered = regularQuestions.every((q) => answers[q.questionKey]) && (!hasExactScoreQuestion || exactScoreEntered)
+
+  const allAnswered =
+    regularQuestions.every((q) => answers[q.questionKey]) &&
+    exactScoreEntered
+
   const isFinished = match?.status === "finished"
   const isLive = match?.status === "live"
   const isLocked = match?.status !== "scheduled"
@@ -143,7 +147,7 @@ export default function MatchPage() {
           anonUserId,
           answers: {
             ...answers,
-            ...(exactScoreEntered ? { exact_score: `${exactHome}-${exactAway}` } : {}),
+            exact_score: `${exactHome}-${exactAway}`,
             confidence: String(confidence),
           },
           confidence,
@@ -154,7 +158,19 @@ export default function MatchPage() {
         setError(data.error ?? "Something went wrong")
       } else {
         setSubmitted(true)
-        setMyPrediction({ id: "temp", answers: { ...answers, confidence: String(confidence) }, confidence, score: null, maxPossibleScore: null, scored: false, createdAt: new Date().toISOString() })
+        setMyPrediction({
+          id: "temp",
+          answers: {
+            ...answers,
+            exact_score: `${exactHome}-${exactAway}`,
+            confidence: String(confidence),
+          },
+          confidence,
+          score: null,
+          maxPossibleScore: null,
+          scored: false,
+          createdAt: new Date().toISOString(),
+        })
         fetch(`/api/matches/${id}/crowd`).then((r) => r.json()).then(setCrowd).catch(() => {})
       }
     } catch {
@@ -193,7 +209,7 @@ export default function MatchPage() {
         </div>
       )}
 
-      {/* ── ALREADY PREDICTED: show "Your Prediction" summary instead of the form ── */}
+      {/* ── ALREADY PREDICTED: show "Your Prediction" summary ── */}
       {alreadyPredicted && myPrediction && (
         <>
           {submitted && (
@@ -219,7 +235,8 @@ export default function MatchPage() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {mainQuestions.map((q) => {
+              {/* Regular questions only — exact_score handled separately below */}
+              {regularQuestions.map((q) => {
                 const myAnswer = myPrediction.answers[q.questionKey]
                 const myOption = q.options.find((o) => o.value === myAnswer)
                 const isCorrect = isFinished && q.correctAnswer === myAnswer
@@ -237,6 +254,15 @@ export default function MatchPage() {
                   </div>
                 )
               })}
+
+              {/* Exact score row — always shown */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 10, borderBottom: "1px solid var(--line)" }}>
+                <span style={{ fontSize: 13, color: "var(--chalk-faint)" }}>Exact Score</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "var(--chalk)" }}>
+                  {myPrediction.answers.exact_score ?? "—"}
+                </span>
+              </div>
+
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: 13, color: "var(--chalk-faint)" }}>Confidence</span>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "var(--gold)" }}>
@@ -249,7 +275,7 @@ export default function MatchPage() {
           {crowd && crowd.percentages.winner && (
             <div className="glass-row" style={{ background: "rgba(45,122,45,0.04)", padding: "24px", width: "100%", marginBottom: 20 }}>
               <div className="display" style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--chalk-faint)", marginBottom: 14 }}>
-                🧠 How the crowd voted
+                 How the crowd voted
               </div>
               {[
                 { value: "home", label: match.homeTeam },
@@ -292,94 +318,90 @@ export default function MatchPage() {
 
           {!isFinished && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {mainQuestions.map((q, i) => {
-                const isExactScore = q.questionKey === "exact_score"
+              {/* Regular questions — exact_score excluded from this loop */}
+              {regularQuestions.map((q, i) => (
+                <div key={q.id} className="glass-row" style={{ background: "rgba(255,255,255,0.03)", padding: "20px 24px", width: "100%" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
+                    <span className="display" style={{ fontSize: 13, fontWeight: 700, color: "var(--grass)", letterSpacing: "0.06em" }}>Q{i + 1}</span>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: "var(--chalk)" }}>{q.questionText}</span>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {q.options.map((opt) => {
+                      const selected = answers[q.questionKey] === opt.value
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => !isLocked && setAnswers((a) => ({ ...a, [q.questionKey]: opt.value }))}
+                          disabled={isLocked}
+                          style={{
+                            padding: "8px 16px", borderRadius: 5, fontSize: 14, fontWeight: 500,
+                            cursor: isLocked ? "default" : "pointer",
+                            border: `1px solid ${selected ? "var(--grass)" : "var(--line-bright)"}`,
+                            background: selected ? "rgba(45,122,45,0.15)" : "transparent",
+                            color: selected ? "var(--chalk)" : "var(--chalk-dim)",
+                            transition: "all 0.15s",
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
 
-                if (isExactScore) {
-                  return (
-                    <div key={q.id} className="glass-row" style={{ background: "rgba(232,193,74,0.07)", padding: "20px 24px", width: "100%", border: "1px solid rgba(232,193,74,0.22)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                        <span className="display" style={{ fontSize: 13, fontWeight: 700, color: "var(--gold)", letterSpacing: "0.06em" }}>BONUS</span>
-                        <span style={{ fontSize: 15, fontWeight: 500, color: "var(--chalk)" }}>Exact Score</span>
-                        <span style={{ fontSize: 11, color: "var(--chalk-faint)", marginLeft: "auto" }}>+10 pts if correct</span>
+              {/* Exact Score — always rendered, never API-dependent */}
+              {!isLocked && (
+                <div className="glass-row" style={{ background: "rgba(232,193,74,0.07)", padding: "20px 24px", width: "100%", border: "1px solid rgba(232,193,74,0.22)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                    <span className="display" style={{ fontSize: 13, fontWeight: 700, color: "var(--gold)", letterSpacing: "0.06em" }}>BONUS</span>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: "var(--chalk)" }}>Exact Score</span>
+                    <span style={{ fontSize: 11, color: "var(--chalk-faint)", marginLeft: "auto" }}>+10 pts if correct</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: "var(--chalk-faint)", marginBottom: 18 }}>
+                    Get the exact final score and earn a flat 10-point bonus. Wrong guess = zero bonus, but your normal predictions are unaffected either way.
+                  </p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 20, justifyContent: "center" }}>
+                    {/* Home goals stepper */}
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--chalk-dim)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
+                        {match.homeTeamCode}
                       </div>
-                      <p style={{ fontSize: 12, color: "var(--chalk-faint)", marginBottom: 18 }}>
-                        Get the exact final score and earn a flat 10-point bonus. Wrong guess = zero bonus, but your normal predictions are unaffected either way.
-                      </p>
-                      <div style={{ display: "flex", alignItems: "center", gap: 20, justifyContent: "center" }}>
-                        {/* Home goals stepper */}
-                        <div style={{ textAlign: "center" }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--chalk-dim)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
-                            {match.homeTeamCode}
-                          </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <button onClick={() => { setExactHome(Math.max(0, exactHome - 1)); setExactScoreEntered(true) }} disabled={isLocked}
-                              style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>−</button>
-                            <span className="display" style={{ fontSize: 36, fontWeight: 900, minWidth: 44, textAlign: "center", color: exactScoreEntered ? "var(--chalk)" : "var(--chalk-faint)" }}>{exactHome}</span>
-                            <button onClick={() => { setExactHome(exactHome + 1); setExactScoreEntered(true) }} disabled={isLocked}
-                              style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>+</button>
-                          </div>
-                        </div>
-                        <span className="display" style={{ fontSize: 30, fontWeight: 900, color: "var(--chalk-faint)", paddingTop: 28 }}>–</span>
-                        {/* Away goals stepper */}
-                        <div style={{ textAlign: "center" }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--chalk-dim)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
-                            {match.awayTeamCode}
-                          </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <button onClick={() => { setExactAway(Math.max(0, exactAway - 1)); setExactScoreEntered(true) }} disabled={isLocked}
-                              style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>−</button>
-                            <span className="display" style={{ fontSize: 36, fontWeight: 900, minWidth: 44, textAlign: "center", color: exactScoreEntered ? "var(--chalk)" : "var(--chalk-faint)" }}>{exactAway}</span>
-                            <button onClick={() => { setExactAway(exactAway + 1); setExactScoreEntered(true) }} disabled={isLocked}
-                              style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>+</button>
-                          </div>
-                        </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <button onClick={() => { setExactHome(Math.max(0, exactHome - 1)); setExactScoreEntered(true) }}
+                          style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>−</button>
+                        <span className="display" style={{ fontSize: 36, fontWeight: 900, minWidth: 44, textAlign: "center", color: exactScoreEntered ? "var(--chalk)" : "var(--chalk-faint)" }}>{exactHome}</span>
+                        <button onClick={() => { setExactHome(exactHome + 1); setExactScoreEntered(true) }}
+                          style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>+</button>
                       </div>
-                      {exactScoreEntered ? (
-                        <div style={{ textAlign: "center", marginTop: 14, fontSize: 13, color: "var(--chalk-dim)" }}>
-                          Your prediction: <strong>{match.homeTeamCode} {exactHome} – {exactAway} {match.awayTeamCode}</strong>
-                          {" "}<button onClick={() => setExactScoreEntered(false)} style={{ fontSize: 11, color: "var(--chalk-faint)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>clear</button>
-                        </div>
-                      ) : (
-                        <div style={{ textAlign: "center", marginTop: 14, fontSize: 12, color: "var(--chalk-faint)" }}>
-                          Tap + or − to enter your score and unlock the bonus
-                        </div>
-                      )}
                     </div>
-                  )
-                }
-
-                return (
-                  <div key={q.id} className="glass-row" style={{ background: "rgba(255,255,255,0.03)", padding: "20px 24px", width: "100%" }}>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
-                      <span className="display" style={{ fontSize: 13, fontWeight: 700, color: "var(--grass)", letterSpacing: "0.06em" }}>Q{i + 1}</span>
-                      <span style={{ fontSize: 15, fontWeight: 500, color: "var(--chalk)" }}>{q.questionText}</span>
-                    </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                      {q.options.map((opt) => {
-                        const selected = answers[q.questionKey] === opt.value
-                        return (
-                          <button
-                            key={opt.value}
-                            onClick={() => !isLocked && setAnswers((a) => ({ ...a, [q.questionKey]: opt.value }))}
-                            disabled={isLocked}
-                            style={{
-                              padding: "8px 16px", borderRadius: 5, fontSize: 14, fontWeight: 500,
-                              cursor: isLocked ? "default" : "pointer",
-                              border: `1px solid ${selected ? "var(--grass)" : "var(--line-bright)"}`,
-                              background: selected ? "rgba(45,122,45,0.15)" : "transparent",
-                              color: selected ? "var(--chalk)" : "var(--chalk-dim)",
-                              transition: "all 0.15s",
-                            }}
-                          >
-                            {opt.label}
-                          </button>
-                        )
-                      })}
+                    <span className="display" style={{ fontSize: 30, fontWeight: 900, color: "var(--chalk-faint)", paddingTop: 28 }}>–</span>
+                    {/* Away goals stepper */}
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--chalk-dim)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
+                        {match.awayTeamCode}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <button onClick={() => { setExactAway(Math.max(0, exactAway - 1)); setExactScoreEntered(true) }}
+                          style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>−</button>
+                        <span className="display" style={{ fontSize: 36, fontWeight: 900, minWidth: 44, textAlign: "center", color: exactScoreEntered ? "var(--chalk)" : "var(--chalk-faint)" }}>{exactAway}</span>
+                        <button onClick={() => { setExactAway(exactAway + 1); setExactScoreEntered(true) }}
+                          style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--line-bright)", background: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", fontWeight: 700 }}>+</button>
+                      </div>
                     </div>
                   </div>
-                )
-              })}
+                  {exactScoreEntered ? (
+                    <div style={{ textAlign: "center", marginTop: 14, fontSize: 13, color: "var(--chalk-dim)" }}>
+                      Your prediction: <strong>{match.homeTeamCode} {exactHome} – {exactAway} {match.awayTeamCode}</strong>
+                      {" "}<button onClick={() => setExactScoreEntered(false)} style={{ fontSize: 11, color: "var(--chalk-faint)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>clear</button>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", marginTop: 14, fontSize: 12, color: "var(--chalk-faint)" }}>
+                      Tap + or − to enter your score and unlock the bonus
+                    </div>
+                  )}
+                </div>
+              )}
 
               {!isLocked && mainQuestions.length > 0 && (
                 <div className="glass-row" style={{ background: "rgba(232,193,74,0.06)", padding: "20px 24px", width: "100%" }}>
@@ -406,7 +428,7 @@ export default function MatchPage() {
                     disabled={!allAnswered || submitting}
                     onClick={handleSubmit}
                   >
-                    {submitting ? "Locking in..." : !allAnswered ? `Answer all ${mainQuestions.length} questions` : "Lock In My Prediction ⚽"}
+                    {submitting ? "Locking in..." : !allAnswered ? `Answer all questions` : "Lock In My Prediction "}
                   </button>
                 </div>
               )}
