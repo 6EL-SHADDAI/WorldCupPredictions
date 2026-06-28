@@ -11,12 +11,16 @@ export default async function HomePage() {
   const allMatches = await db.select().from(matches).orderBy(asc(matches.kickoffAt))
 
   const now = new Date()
-  const todayStart = new Date(now); todayStart.setHours(0,0,0,0)
-  const todayEnd = new Date(now); todayEnd.setHours(23,59,59,999)
+  const todayStart = new Date(now)
+  todayStart.setHours(0, 0, 0, 0)
+
+  const todayEnd = new Date(now)
+  todayEnd.setHours(23, 59, 59, 999)
 
   const live = allMatches.filter((m) => m.status === "live")
   const upcoming = allMatches.filter((m) => m.status === "scheduled")
   const finished = allMatches.filter((m) => m.status === "finished")
+
   const todaysMatches = allMatches.filter((m) => {
     const k = new Date(m.kickoffAt)
     return k >= todayStart && k <= todayEnd
@@ -24,10 +28,6 @@ export default async function HomePage() {
 
   return (
     <div style={{ maxWidth: 780, margin: "0 auto", padding: "40px 20px 80px" }}>
-      {todaysMatches.length > 0 && (
-        <MatchDayBanner count={todaysMatches.length} live={live.length} />
-      )}
-
       {/* Hero — stadium photo background */}
       <div
         style={{
@@ -44,11 +44,15 @@ export default async function HomePage() {
         }}
       >
         {/* Overlay */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(180deg, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.32) 45%, rgba(20,55,20,0.65) 100%)",
-          borderRadius: 28,
-        }} />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.32) 45%, rgba(20,55,20,0.65) 100%)",
+            borderRadius: 28,
+          }}
+        />
 
         <div style={{ position: "relative", zIndex: 1 }}>
           <h1
@@ -66,23 +70,53 @@ export default async function HomePage() {
             <span style={{ color: "rgba(255,255,255,0.35)" }}>?</span>
           </h1>
 
-          <p style={{ marginTop: 18, fontSize: 16, color: "rgba(255,255,255,0.8)", maxWidth: 460, margin: "18px auto 0", lineHeight: 1.5 }}>
+          <p
+            style={{
+              marginTop: 18,
+              fontSize: 16,
+              color: "rgba(255,255,255,0.8)",
+              maxWidth: 460,
+              margin: "18px auto 0",
+              lineHeight: 1.5,
+            }}
+          >
             Prove it. Predict every match, build a streak, and see how your calls
             stack up against everyone else watching this World Cup.
           </p>
 
-          <div style={{ marginTop: 32, display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+          <div
+            style={{
+              marginTop: 32,
+              display: "flex",
+              gap: 14,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
             {[
               { value: allMatches.length, label: "Matches", color: "#ffffff" },
               { value: upcoming.length, label: "To Predict", color: "#6ddd6d" },
               { value: finished.length, label: "Played", color: "#f5c842" },
               { value: live.length || undefined, label: "Live Now", color: "#ff6b6b" },
-            ].filter((s) => s.value !== undefined && s.value !== 0).map(({ value, label, color }) => (
-              <HeroStatTile key={label} value={value as number} label={label} color={color} dark />
-            ))}
+            ]
+              .filter((s) => s.value !== undefined && s.value !== 0)
+              .map(({ value, label, color }) => (
+                <HeroStatTile
+                  key={label}
+                  value={value as number}
+                  label={label}
+                  color={color}
+                  dark
+                />
+              ))}
           </div>
         </div>
       </div>
+
+      {/* Match Day Banner moved below Hero */}
+      {todaysMatches.length > 0 && (
+        <MatchDayBanner count={todaysMatches.length} live={live.length} />
+      )}
 
       <MatchExplorer allMatches={allMatches} />
     </div>
