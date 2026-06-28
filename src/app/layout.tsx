@@ -25,13 +25,13 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "UKNOWBALL?",
   },
 }
 
 export const viewport: Viewport = {
-  themeColor: "#2d7a2d",
+  themeColor: "#0a0f0a",
   width: "device-width",
   initialScale: 1,
 }
