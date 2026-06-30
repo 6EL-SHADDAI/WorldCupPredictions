@@ -64,23 +64,32 @@ export async function POST(req: NextRequest, { params }: Params) {
     )
   }
 
-  // ── 5. Validate option values are legitimate ───────────────────────────────
-  const dbQuestions = await db
-    .select()
-    .from(questions)
-    .where(eq(questions.matchId, matchId))
+  // ── 5. Validate option values are legitimate ──
+const dbQuestions = await db.select().from(questions).where(eq(questions.matchId, matchId))
 
-  for (const q of dbQuestions) {
-    const userAnswer = answers[q.questionKey]
-    if (!userAnswer) continue
-    const validValues = (q.options as Array<{ value: string }>).map((o) => o.value)
-    if (!validValues.includes(userAnswer)) {
+for (const q of dbQuestions) {
+  const userAnswer = answers[q.questionKey]
+  if (!userAnswer) continue
+
+  // exact_score is free-form "home-away" (e.g. "2-1"), not a fixed option list
+  if (q.questionKey === "exact_score") {
+    if (!/^\d+-\d+$/.test(userAnswer)) {
       return NextResponse.json(
-        { error: `Invalid answer "${userAnswer}" for question "${q.questionKey}"` },
+        { error: `Invalid answer "${userAnswer}" for question "exact_score"` },
         { status: 400 }
       )
     }
+    continue
   }
+
+  const validValues = (q.options as Array<{ value: string }>).map((o) => o.value)
+  if (!validValues.includes(userAnswer)) {
+    return NextResponse.json(
+      { error: `Invalid answer "${userAnswer}" for question "${q.questionKey}"` },
+      { status: 400 }
+    )
+  }
+}
 
   // ── 6. Write prediction then upsert streak ────────────────────────────────
   try {
