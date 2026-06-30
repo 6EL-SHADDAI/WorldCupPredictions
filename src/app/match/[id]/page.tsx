@@ -126,9 +126,7 @@ export default function MatchPage() {
   const mainQuestions = questions.filter((q) => q.questionKey !== "confidence")
   const regularQuestions = mainQuestions.filter((q) => q.questionKey !== "exact_score")
 
-  const allAnswered =
-    regularQuestions.every((q) => answers[q.questionKey]) &&
-    exactScoreEntered
+ const allAnswered = regularQuestions.every((q) => answers[q.questionKey])
 
   const isFinished = match?.status === "finished"
   const isLive = match?.status === "live"
